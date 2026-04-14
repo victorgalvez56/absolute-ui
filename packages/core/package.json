@@ -8,11 +8,21 @@
   "files": ["src", "README.md"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@absolute-ui/a11y": "workspace:*",
+    "@absolute-ui/tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18.3.0",
     "react-native": ">=0.76.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "react": "^18.3.1",
+    "react-native": "^0.76.5"
   },
   "publishConfig": {
     "access": "public"
