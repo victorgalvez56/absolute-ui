@@ -34,12 +34,12 @@ That's the gap. That's what we're building.
 
 | | |
 |---|---|
-| 🪟 **Distinctive UI** | Real `UIGlassEffect` on iOS 26, tuned fallback on Android, 4 personality themes — no generic AI aesthetics |
-| ⚡ **Performance as a contract** | 120fps budget, <16ms p95 frame time, <50KB per primitive, Reassure + Flashlight gates on every PR |
-| ♿ **Accessibility as a contract** | WCAG 2.2 AA + APCA runtime contrast, dynamic type, reduced motion/transparency, VoiceOver + TalkBack E2E |
-| 🎨 **Personalities, not just themes** | Aurora · Obsidian · Frost · Sunset — coordinated token + motion + haptic variants |
-| 📐 **Pixel-perfect to Figma** | Automated visual regression against the Figma source of truth |
-| 🔓 **Forkable by design** | Copy-paste mode *and* npm package mode — own your code if you want to |
+| **Distinctive UI** | Real `UIGlassEffect` on iOS 26, tuned fallback on Android, 4 personality themes — no generic AI aesthetics |
+| **Performance as a contract** | 120fps budget, <16ms p95 frame time, <50KB per primitive, Reassure + Flashlight gates on every PR |
+| **Accessibility as a contract** | WCAG 2.2 AA + APCA runtime contrast, dynamic type, reduced motion/transparency, VoiceOver + TalkBack E2E |
+| **Personalities, not just themes** | Aurora · Obsidian · Frost · Sunset — coordinated token + motion + haptic variants |
+| **Pixel-perfect to Figma** | Automated visual regression against the Figma source of truth |
+| **Forkable by design** | Copy-paste mode *and* npm package mode — own your code if you want to |
 
 ---
 
@@ -103,10 +103,10 @@ Test stack: **Jest + RNTL** · **Maestro** (E2E) · **Reassure** (perf) · **Fla
 
 This repo is the single source of truth for the project. Start here:
 
-- 📋 **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — architecture, phases, success criteria
-- 🔍 **[RESEARCH.md](./RESEARCH.md)** — competitive analysis, positioning, value props
-- ⚙️ **[WORKFLOW.md](./WORKFLOW.md)** — how new components get built, tested, and released
-- 📊 **[DIAGRAMS.md](./DIAGRAMS.md)** — visual architecture, workflows, test pyramid, roadmap
+- **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — architecture, phases, success criteria
+- **[RESEARCH.md](./RESEARCH.md)** — competitive analysis, positioning, value props
+- **[WORKFLOW.md](./WORKFLOW.md)** — how new components get built, tested, and released
+- **[DIAGRAMS.md](./DIAGRAMS.md)** — visual architecture, workflows, test pyramid, roadmap
 
 ---
 
