@@ -1,0 +1,21 @@
+{
+  "name": "absolute-ui",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Liquid glass React Native design system with performance and accessibility as CI contracts.",
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter='./packages/*' run build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.6.3"
+  }
+}
