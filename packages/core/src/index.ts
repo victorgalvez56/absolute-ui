@@ -30,3 +30,6 @@ export type { GlassSheetProps } from './components/GlassSheet/index.js';
 
 export { GlassNavBar } from './components/GlassNavBar/index.js';
 export type { GlassNavBarProps } from './components/GlassNavBar/index.js';
+
+export { GlassTabBar } from './components/GlassTabBar/index.js';
+export type { GlassTabBarItem, GlassTabBarProps } from './components/GlassTabBar/index.js';
