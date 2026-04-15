@@ -15,3 +15,12 @@ export type { GlassSurfaceProps } from './components/GlassSurface/index.js';
 
 export { GlassButton } from './components/GlassButton/index.js';
 export type { GlassButtonProps } from './components/GlassButton/index.js';
+
+export { GlassCard } from './components/GlassCard/index.js';
+export type {
+  GlassCardProps,
+  GlassCardHeaderProps,
+  GlassCardBodyProps,
+  GlassCardFooterProps,
+  GlassCardDividerProps,
+} from './components/GlassCard/index.js';
