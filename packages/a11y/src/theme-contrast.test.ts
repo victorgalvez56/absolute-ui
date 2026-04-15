@@ -54,3 +54,23 @@ describe('theme contrast on composited elevation-1 surfaces', () => {
     expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
   });
 });
+
+/**
+ * Elevation 2 is the default for GlassNavBar and for promoted
+ * GlassCard variants. The tint is heavier than elevation 1, so the
+ * composited background shifts further from the raw theme
+ * background — verify both text roles still meet the floor.
+ */
+describe('theme contrast on composited elevation-2 surfaces', () => {
+  test.each(themes)('%s textPrimary meets the body contrast floor', (_name, theme) => {
+    const surface = composite(theme.glass[2].tint, theme.colors.background);
+    const lc = apcaContrast(theme.colors.textPrimary, surface);
+    expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
+  });
+
+  test.each(themes)('%s textSecondary meets the body contrast floor', (_name, theme) => {
+    const surface = composite(theme.glass[2].tint, theme.colors.background);
+    const lc = apcaContrast(theme.colors.textSecondary, surface);
+    expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
+  });
+});
