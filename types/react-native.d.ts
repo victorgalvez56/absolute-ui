@@ -85,8 +85,43 @@ declare module 'react-native' {
     bounces?: boolean;
   };
 
+  export type KeyboardType =
+    | 'default'
+    | 'email-address'
+    | 'numeric'
+    | 'phone-pad'
+    | 'number-pad'
+    | 'decimal-pad'
+    | 'url'
+    | 'visible-password';
+
+  export type TextInputProps = Omit<ViewProps, 'style' | 'children'> & {
+    value?: string;
+    defaultValue?: string;
+    placeholder?: string;
+    placeholderTextColor?: string;
+    editable?: boolean;
+    secureTextEntry?: boolean;
+    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+    autoCorrect?: boolean;
+    autoFocus?: boolean;
+    keyboardType?: KeyboardType;
+    maxLength?: number;
+    multiline?: boolean;
+    numberOfLines?: number;
+    returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
+    onChangeText?: (text: string) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
+    onSubmitEditing?: () => void;
+    style?: TextStyle | ReadonlyArray<TextStyle | false | null | undefined>;
+    allowFontScaling?: boolean;
+    'aria-invalid'?: boolean;
+  };
+
   export const View: ComponentType<ViewProps>;
   export const Text: ComponentType<TextProps>;
   export const Pressable: ComponentType<PressableProps>;
   export const ScrollView: ComponentType<ScrollViewProps>;
+  export const TextInput: ComponentType<TextInputProps>;
 }

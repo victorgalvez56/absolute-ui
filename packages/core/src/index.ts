@@ -43,3 +43,6 @@ export type {
   ToastPosition,
   ToastVariant,
 } from './components/GlassToast/index.js';
+
+export { GlassInput } from './components/GlassInput/index.js';
+export type { GlassInputProps } from './components/GlassInput/index.js';
