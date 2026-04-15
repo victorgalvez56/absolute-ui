@@ -18,6 +18,8 @@ import { aurora, frost, obsidian, sunset } from '@absolute-ui/tokens';
  */
 import { describe, expect, test } from 'vitest';
 import {
+  FOCUS_RING_OFFSET,
+  FOCUS_RING_WIDTH,
   MIN_HIT_TARGET,
   buildGlassButtonPressableStyle,
   buildGlassButtonTextStyle,
@@ -26,31 +28,101 @@ import {
   shouldWrapChildInText,
 } from './style.js';
 
+const FOCUS = '#A6F0E0';
+
 describe('buildGlassButtonPressableStyle', () => {
   test('enforces the 44x44 minimum hit target', () => {
-    const style = buildGlassButtonPressableStyle({ pressed: false, disabled: false });
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+    });
     expect(style.minWidth).toBe(MIN_HIT_TARGET);
     expect(style.minHeight).toBe(MIN_HIT_TARGET);
     expect(MIN_HIT_TARGET).toBe(44);
   });
 
   test('idle state is fully opaque', () => {
-    expect(buildGlassButtonPressableStyle({ pressed: false, disabled: false }).opacity).toBe(1);
+    expect(
+      buildGlassButtonPressableStyle({ pressed: false, disabled: false, focusRingColor: FOCUS })
+        .opacity,
+    ).toBe(1);
   });
 
   test('pressed state dims to 0.7', () => {
-    expect(buildGlassButtonPressableStyle({ pressed: true, disabled: false }).opacity).toBe(0.7);
+    expect(
+      buildGlassButtonPressableStyle({ pressed: true, disabled: false, focusRingColor: FOCUS })
+        .opacity,
+    ).toBe(0.7);
   });
 
   test('disabled dims to 0.4 regardless of pressed', () => {
-    expect(buildGlassButtonPressableStyle({ pressed: false, disabled: true }).opacity).toBe(0.4);
-    expect(buildGlassButtonPressableStyle({ pressed: true, disabled: true }).opacity).toBe(0.4);
+    expect(
+      buildGlassButtonPressableStyle({ pressed: false, disabled: true, focusRingColor: FOCUS })
+        .opacity,
+    ).toBe(0.4);
+    expect(
+      buildGlassButtonPressableStyle({ pressed: true, disabled: true, focusRingColor: FOCUS })
+        .opacity,
+    ).toBe(0.4);
   });
 
   test('centers content on both axes', () => {
-    const style = buildGlassButtonPressableStyle({ pressed: false, disabled: false });
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+    });
     expect(style.alignItems).toBe('center');
     expect(style.justifyContent).toBe('center');
+  });
+});
+
+describe('focus ring', () => {
+  test('idle button has no outline', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focused: false,
+      focusRingColor: FOCUS,
+    });
+    expect(style.outlineStyle).toBe('none');
+    expect(style.outlineWidth).toBe(0);
+  });
+
+  test('focused button renders the themed outline', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focused: true,
+      focusRingColor: FOCUS,
+    });
+    expect(style.outlineStyle).toBe('solid');
+    expect(style.outlineWidth).toBe(FOCUS_RING_WIDTH);
+    expect(style.outlineColor).toBe(FOCUS);
+    expect(style.outlineOffset).toBe(FOCUS_RING_OFFSET);
+  });
+
+  test('disabled button suppresses the focus ring', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: true,
+      focused: true,
+      focusRingColor: FOCUS,
+    });
+    expect(style.outlineStyle).toBe('none');
+    expect(style.outlineWidth).toBe(0);
+  });
+
+  test('focus ring still shows while the button is being pressed', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: true,
+      disabled: false,
+      focused: true,
+      focusRingColor: FOCUS,
+    });
+    expect(style.outlineStyle).toBe('solid');
+    expect(style.opacity).toBe(0.7);
   });
 });
 

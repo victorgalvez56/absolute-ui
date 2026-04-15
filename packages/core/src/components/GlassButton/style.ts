@@ -18,6 +18,19 @@ export type GlassButtonPressableStyle = {
   alignItems: 'center';
   justifyContent: 'center';
   opacity: number;
+  /**
+   * Web focus ring, rendered only when the Pressable reports
+   * `focused: true`. On react-native-web these become real CSS
+   * `outline` / `outline-offset` rules, so keyboard and switch
+   * control users see a high-contrast indicator that the a11y
+   * contract requires. On native, the `@absolute-ui/a11y`
+   * `getFocusRing` helper will render an equivalent border View
+   * (wired in Phase 2 when the motion layer lands).
+   */
+  outlineStyle?: 'solid' | 'none';
+  outlineWidth?: number;
+  outlineColor?: string;
+  outlineOffset?: number;
 };
 
 export type GlassButtonTextStyle = {
@@ -28,16 +41,37 @@ export type GlassButtonTextStyle = {
 };
 
 /**
+ * Focus ring stroke width, in density-independent pixels. Matches the
+ * `@absolute-ui/a11y` `defaultFocusRing.width` so the visible indicator
+ * is consistent across primitives.
+ */
+export const FOCUS_RING_WIDTH = 3;
+
+/**
+ * Distance between the Pressable's edge and the focus ring stroke, in
+ * density-independent pixels. Mirrors `defaultFocusRing.offset`.
+ */
+export const FOCUS_RING_OFFSET = 2;
+
+/**
  * Resolve the Pressable's inline style for the given interaction state.
+ *
  * Disabled wins over pressed — a disabled button must never flash the
  * pressed opacity even if the underlying touchable reports pressed=true.
+ *
+ * When `focused` is true (reported by react-native-web's Pressable
+ * callback for keyboard and switch-control navigation), the style adds
+ * a solid outline tinted with `focusRingColor`. This is the visible
+ * focus indicator required by the Absolute UI accessibility contract.
  */
 export function buildGlassButtonPressableStyle(options: {
   pressed: boolean;
   disabled: boolean;
+  focused?: boolean;
+  focusRingColor: string;
 }): GlassButtonPressableStyle {
-  const { pressed, disabled } = options;
-  return {
+  const { pressed, disabled, focused = false, focusRingColor } = options;
+  const base: GlassButtonPressableStyle = {
     minWidth: MIN_HIT_TARGET,
     minHeight: MIN_HIT_TARGET,
     paddingHorizontal: 20,
@@ -45,7 +79,20 @@ export function buildGlassButtonPressableStyle(options: {
     alignItems: 'center',
     justifyContent: 'center',
     opacity: disabled ? 0.4 : pressed ? 0.7 : 1,
+    outlineStyle: 'none',
+    outlineWidth: 0,
+    outlineOffset: 0,
   };
+  if (focused && !disabled) {
+    return {
+      ...base,
+      outlineStyle: 'solid',
+      outlineWidth: FOCUS_RING_WIDTH,
+      outlineColor: focusRingColor,
+      outlineOffset: FOCUS_RING_OFFSET,
+    };
+  }
+  return base;
 }
 
 /**

@@ -42,7 +42,11 @@ export type GlassButtonProps = {
    */
   radius?: GlassSurfaceProps['radius'];
   /**
-   * Extra style for the surface wrapper. Use for width / margin.
+   * Extra style for the surface wrapper. Prefer `minWidth` and
+   * `margin` — avoid fixed `width` / `height`. When the user's
+   * Dynamic Type setting scales the label, a fixed width will
+   * clip the text. The button's `minWidth: 44` + flex padding
+   * already handle the common case without caller overrides.
    */
   style?: ViewStyle;
   /**
@@ -97,10 +101,16 @@ export const GlassButton = forwardRef<unknown, GlassButtonProps>(function GlassB
     return children;
   }, [children, theme]);
 
+  const focusRingColor = theme.colors.focusRing;
   const pressableStyle = useCallback(
-    ({ pressed }: PressableStateCallbackType): ViewStyle =>
-      buildGlassButtonPressableStyle({ pressed, disabled }),
-    [disabled],
+    ({ pressed, focused }: PressableStateCallbackType): ViewStyle =>
+      buildGlassButtonPressableStyle({
+        pressed,
+        disabled,
+        focused: focused ?? false,
+        focusRingColor,
+      }),
+    [disabled, focusRingColor],
   );
 
   return (
