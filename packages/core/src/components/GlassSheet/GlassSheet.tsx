@@ -59,10 +59,10 @@ export const GlassSheet = forwardRef<unknown, GlassSheetProps>(function GlassShe
   { visible, onDismiss, title, accessibilityLabel, children },
   _ref,
 ) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
   if (!visible) return null;
 
-  const scrimColor = resolveSheetScrimColor(theme.dark);
+  const scrimColor = resolveSheetScrimColor(theme.dark, preferences.reducedTransparency);
   const backdropStyle = buildSheetBackdropStyle(scrimColor);
   const containerStyle = buildSheetContainerStyle();
   const handleStyle = buildSheetHandleStyle(theme.colors.divider);

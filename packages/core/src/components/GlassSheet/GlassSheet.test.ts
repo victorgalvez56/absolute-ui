@@ -107,4 +107,22 @@ describe('resolveSheetScrimColor', () => {
     const expected = theme.dark ? '#FFFFFF26' : '#00000066';
     expect(resolveSheetScrimColor(theme.dark)).toBe(expected);
   });
+
+  test('reduced transparency bumps the dark-theme alpha', () => {
+    expect(resolveSheetScrimColor(true, true)).toBe('#FFFFFF66');
+  });
+
+  test('reduced transparency bumps the light-theme alpha', () => {
+    expect(resolveSheetScrimColor(false, true)).toBe('#000000A6');
+  });
+
+  test('reduced-transparency alpha is higher than default alpha', () => {
+    const defaultDark = Number.parseInt(resolveSheetScrimColor(true, false).slice(-2), 16);
+    const reducedDark = Number.parseInt(resolveSheetScrimColor(true, true).slice(-2), 16);
+    expect(reducedDark).toBeGreaterThan(defaultDark);
+
+    const defaultLight = Number.parseInt(resolveSheetScrimColor(false, false).slice(-2), 16);
+    const reducedLight = Number.parseInt(resolveSheetScrimColor(false, true).slice(-2), 16);
+    expect(reducedLight).toBeGreaterThan(defaultLight);
+  });
 });

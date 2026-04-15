@@ -100,10 +100,19 @@ export function buildSheetTitleStyle(textPrimary: string): SheetTitleStyle {
 }
 
 /**
- * Default scrim opacity, expressed as a hex alpha suffix. Dark themes
- * use a lighter tinted scrim; light themes use a dark scrim. The
- * caller composes the two values with the theme background.
+ * Scrim color resolver. Dark themes use a lighter tinted scrim; light
+ * themes use a dark scrim. When `reducedTransparency` is true the
+ * alpha bumps up so the modal cue stays strong — users with reduced
+ * transparency enabled can otherwise lose the "this is a modal"
+ * signal because the sheet surface itself becomes solid through
+ * GlassSurface's fallback path.
+ *
+ * Standard alpha: `#FFFFFF26` (~15%) on dark, `#00000066` (~40%) on light.
+ * Reduced transparency: `#FFFFFF66` (~40%) on dark, `#000000A6` (~65%) on light.
  */
-export function resolveSheetScrimColor(isDarkTheme: boolean): string {
+export function resolveSheetScrimColor(isDarkTheme: boolean, reducedTransparency = false): string {
+  if (reducedTransparency) {
+    return isDarkTheme ? '#FFFFFF66' : '#000000A6';
+  }
   return isDarkTheme ? '#FFFFFF26' : '#00000066';
 }
