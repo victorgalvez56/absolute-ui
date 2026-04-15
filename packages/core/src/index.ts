@@ -24,3 +24,6 @@ export type {
   GlassCardFooterProps,
   GlassCardDividerProps,
 } from './components/GlassCard/index.js';
+
+export { GlassSheet } from './components/GlassSheet/index.js';
+export type { GlassSheetProps } from './components/GlassSheet/index.js';
