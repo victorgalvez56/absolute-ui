@@ -2,6 +2,13 @@ import { parseHex } from './color.js';
 
 // APCA / SAPC-G4g constants (Andrew Somers, public algorithm).
 // Source of truth: https://github.com/Myndex/SAPC-APCA
+//
+// Note on the transfer curve: APCA intentionally uses a simple power
+// function (gamma 2.4) to approximate linear luminance instead of the
+// piecewise sRGB-to-linear transform used by WCAG 2.x. This is
+// explicit in the reference implementation (`sRtoLin = pow(v, mainTRC)`
+// with `mainTRC = 2.4`). Auditors occasionally flag the absence of the
+// piecewise transform as a bug — it isn't.
 const MAIN_TRC = 2.4;
 const NORM_BG = 0.56;
 const NORM_TXT = 0.57;
