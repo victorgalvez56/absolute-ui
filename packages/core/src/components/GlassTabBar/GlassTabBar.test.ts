@@ -7,17 +7,18 @@
  */
 import { describe, expect, test } from 'vitest';
 import {
-  TAB_ACTIVE_OPACITY,
+  TAB_ACTIVE_UNDERLINE_WIDTH,
   TAB_BAR_GAP,
   TAB_BAR_HORIZONTAL_PADDING,
   TAB_BAR_MIN_HEIGHT,
   TAB_BAR_VERTICAL_PADDING,
-  TAB_INACTIVE_OPACITY,
   TAB_ITEM_MIN_HIT,
   buildTabBarContainerStyle,
   buildTabItemStyle,
   buildTabLabelStyle,
 } from './style.js';
+
+const ACCENT = '#4FD3B5';
 
 describe('buildTabBarContainerStyle', () => {
   const style = buildTabBarContainerStyle();
@@ -30,8 +31,6 @@ describe('buildTabBarContainerStyle', () => {
   test('uses minHeight (Dynamic Type safety) instead of a fixed height', () => {
     expect(style.minHeight).toBe(TAB_BAR_MIN_HEIGHT);
     expect(TAB_BAR_MIN_HEIGHT).toBe(64);
-    // The container must never lock height — labels/icons can grow with
-    // the user's text-size preference.
     expect((style as Record<string, unknown>).height).toBeUndefined();
   });
 
@@ -44,7 +43,7 @@ describe('buildTabBarContainerStyle', () => {
 
 describe('buildTabItemStyle', () => {
   test('every tab is an equal-flex, centered, 44pt-tall hit target', () => {
-    const style = buildTabItemStyle({ active: false });
+    const style = buildTabItemStyle({ active: false, accentColor: ACCENT });
     expect(style.flex).toBe(1);
     expect(style.minHeight).toBe(TAB_ITEM_MIN_HIT);
     expect(TAB_ITEM_MIN_HIT).toBe(44);
@@ -55,17 +54,29 @@ describe('buildTabItemStyle', () => {
     expect((style as Record<string, unknown>).height).toBeUndefined();
   });
 
-  test.each([
-    ['active', true, TAB_ACTIVE_OPACITY],
-    ['inactive', false, TAB_INACTIVE_OPACITY],
-  ] as const)('opacity is %s', (_label, active, expected) => {
-    expect(buildTabItemStyle({ active }).opacity).toBe(expected);
+  test('active tab renders a structural underline in the accent color', () => {
+    const style = buildTabItemStyle({ active: true, accentColor: ACCENT });
+    expect(style.borderBottomWidth).toBe(TAB_ACTIVE_UNDERLINE_WIDTH);
+    expect(TAB_ACTIVE_UNDERLINE_WIDTH).toBe(2);
+    expect(style.borderBottomColor).toBe(ACCENT);
+    expect(style.borderStyle).toBe('solid');
   });
 
-  test('active opacity dominates inactive (color-blind / grayscale fallback cue)', () => {
-    // State must not be encoded in color alone — opacity gap is the
-    // accessibility fallback for users who lose the hue cue.
-    expect(TAB_ACTIVE_OPACITY).toBeGreaterThan(TAB_INACTIVE_OPACITY);
+  test('inactive tab keeps the border at the same width but transparent', () => {
+    // Transparent border keeps the layout stable across state changes —
+    // switching tabs must not reflow content by 2pt.
+    const style = buildTabItemStyle({ active: false, accentColor: ACCENT });
+    expect(style.borderBottomWidth).toBe(TAB_ACTIVE_UNDERLINE_WIDTH);
+    expect(style.borderBottomColor).toBe('transparent');
+  });
+
+  test('item style no longer applies opacity', () => {
+    // Opacity delta dimmed textSecondary past APCA Lc 60 on every theme.
+    // The structural underline + fontWeight carry the state cue instead.
+    const active = buildTabItemStyle({ active: true, accentColor: ACCENT });
+    const inactive = buildTabItemStyle({ active: false, accentColor: ACCENT });
+    expect((active as Record<string, unknown>).opacity).toBeUndefined();
+    expect((inactive as Record<string, unknown>).opacity).toBeUndefined();
   });
 });
 
@@ -91,9 +102,7 @@ describe('buildTabLabelStyle', () => {
     expect(buildTabLabelStyle({ color: '#fff', active }).fontWeight).toBe(expected);
   });
 
-  test('weight changes between states (complements the opacity cue)', () => {
-    // A second non-color cue: bolder weight on the active tab so users
-    // who flatten opacity (high-contrast modes) still see the state.
+  test('weight changes between states (one of two non-color state cues)', () => {
     const active = buildTabLabelStyle({ color: '#fff', active: true });
     const inactive = buildTabLabelStyle({ color: '#fff', active: false });
     expect(active.fontWeight).not.toBe(inactive.fontWeight);

@@ -21,7 +21,20 @@ export type TabItemStyle = {
   alignItems: 'center';
   justifyContent: 'center';
   paddingVertical: number;
-  opacity: number;
+  /**
+   * A bottom border rendered on the active tab as a structural
+   * state indicator. Width of 0 collapses to nothing on inactive
+   * tabs, width > 0 paints the border with the theme accent color
+   * on the active tab. Not color-only: it's a shape change.
+   */
+  borderBottomWidth: number;
+  borderBottomColor: string;
+  /**
+   * Transparent bottom border of the inactive width keeps the
+   * layout identical whether or not the underline is visible,
+   * so switching tabs doesn't shift content by 2pt.
+   */
+  borderStyle: 'solid';
 };
 
 export type TabLabelStyle = {
@@ -36,8 +49,8 @@ export const TAB_BAR_HORIZONTAL_PADDING = 12;
 export const TAB_BAR_VERTICAL_PADDING = 8;
 export const TAB_BAR_GAP = 4;
 export const TAB_ITEM_MIN_HIT = 44;
-export const TAB_INACTIVE_OPACITY = 0.55;
-export const TAB_ACTIVE_OPACITY = 1;
+/** Underline stroke width for the active-tab structural indicator. */
+export const TAB_ACTIVE_UNDERLINE_WIDTH = 2;
 
 export function buildTabBarContainerStyle(): TabBarContainerStyle {
   return {
@@ -50,14 +63,26 @@ export function buildTabBarContainerStyle(): TabBarContainerStyle {
   };
 }
 
-export function buildTabItemStyle(options: { active: boolean }): TabItemStyle {
+/**
+ * Build the item style. Active vs inactive is communicated via an
+ * underline stroke (structural, not color) and the label weight
+ * (handled by buildTabLabelStyle). No opacity delta — dimming
+ * `textSecondary` at 0.55 pushed inactive tab APCA below the Lc 60
+ * floor on every theme.
+ */
+export function buildTabItemStyle(options: {
+  active: boolean;
+  accentColor: string;
+}): TabItemStyle {
   return {
     flex: 1,
     minHeight: TAB_ITEM_MIN_HIT,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 6,
-    opacity: options.active ? TAB_ACTIVE_OPACITY : TAB_INACTIVE_OPACITY,
+    borderStyle: 'solid',
+    borderBottomWidth: TAB_ACTIVE_UNDERLINE_WIDTH,
+    borderBottomColor: options.active ? options.accentColor : 'transparent',
   };
 }
 

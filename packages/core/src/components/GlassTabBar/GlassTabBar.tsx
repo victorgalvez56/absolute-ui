@@ -36,13 +36,17 @@ export type GlassTabBarProps = {
 /**
  * Bottom tab bar. A glass surface with a horizontal row of tabs,
  * each enforcing the 44x44 hit target. Active state is communicated
- * via both weight (500 → 700) and opacity (0.55 → 1.0) so the cue
- * is visible to users with color-blindness or grayscale filters.
+ * via two non-color cues: the label weight steps from 500 to 700,
+ * and the item renders a 2pt structural underline in the theme's
+ * accent color (inactive tabs paint the same border in
+ * `transparent` so the layout stays stable across state changes).
  *
- * Accessibility: the container is `accessibilityRole="tablist"` and
- * each tab carries `accessibilityRole="tab"` with
- * `accessibilityState={{ selected }}`. VoiceOver announces the tab
- * name, the "selected" state, and the position in the list.
+ * Accessibility: `react-native`'s AccessibilityRole shim does not
+ * include `tab` / `tablist`, so the container falls back to `list`
+ * and each item to `button`. VoiceOver still announces the tab
+ * name via the Pressable's label, and `accessibilityState.selected`
+ * reports the active tab. When the shim gains `tab` / `tablist`,
+ * swap both roles in one place without touching the behavior.
  */
 export const GlassTabBar = forwardRef<unknown, GlassTabBarProps>(function GlassTabBar(
   { items, activeKey, onTabPress, elevation = 2, radius = '2xl', style },
@@ -57,9 +61,17 @@ export const GlassTabBar = forwardRef<unknown, GlassTabBarProps>(function GlassT
       <View style={containerStyle} accessibilityRole="list">
         {items.map((item) => {
           const active = item.key === activeKey;
-          const itemStyle = buildTabItemStyle({ active });
-          const labelColor = active ? theme.colors.textPrimary : theme.colors.textSecondary;
-          const labelStyle = buildTabLabelStyle({ color: labelColor, active });
+          const itemStyle = buildTabItemStyle({
+            active,
+            accentColor: theme.colors.accent,
+          });
+          // Always use textPrimary for the label. Dimming to textSecondary
+          // previously broke the APCA Lc 60 floor on all four themes.
+          // Active vs inactive is conveyed by weight + underline, not color.
+          const labelStyle = buildTabLabelStyle({
+            color: theme.colors.textPrimary,
+            active,
+          });
           const label = item.accessibilityLabel ?? item.label;
 
           return (
@@ -72,9 +84,7 @@ export const GlassTabBar = forwardRef<unknown, GlassTabBarProps>(function GlassT
               accessibilityState={{ selected: active }}
             >
               {item.leading ?? null}
-              <Text style={labelStyle} numberOfLines={1}>
-                {item.label}
-              </Text>
+              <Text style={labelStyle}>{item.label}</Text>
             </Pressable>
           );
         })}
