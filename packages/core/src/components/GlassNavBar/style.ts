@@ -8,7 +8,7 @@
  */
 
 export type NavBarContainerStyle = {
-  height: number;
+  minHeight: number;
   flexDirection: 'row';
   alignItems: 'center';
   paddingHorizontal: number;
@@ -16,6 +16,7 @@ export type NavBarContainerStyle = {
 
 export type NavBarSlotStyle = {
   width: number;
+  minHeight: number;
   alignItems: 'flex-start' | 'flex-end';
   justifyContent: 'center';
 };
@@ -28,13 +29,26 @@ export type NavBarTitleStyle = {
   fontWeight: '600';
 };
 
+/**
+ * Minimum bar height. Uses `minHeight` at render time so the bar
+ * can grow when Dynamic Type scales the title past the box, which
+ * prevents glyph clipping at the largest accessibility sizes. A
+ * fixed `height` would trap the label inside 56pt at all scales.
+ */
 export const NAV_BAR_HEIGHT = 56;
 export const NAV_BAR_HORIZONTAL_PADDING = 12;
 export const NAV_BAR_SLOT_WIDTH = 56;
+/**
+ * Hit target floor for interactive children placed in the leading
+ * and trailing slots. The slot itself applies `minHeight: 44` so a
+ * caller that renders an icon-only Pressable still meets the
+ * Absolute UI accessibility contract without extra configuration.
+ */
+export const NAV_BAR_SLOT_MIN_HIT = 44;
 
 export function buildNavBarContainerStyle(): NavBarContainerStyle {
   return {
-    height: NAV_BAR_HEIGHT,
+    minHeight: NAV_BAR_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: NAV_BAR_HORIZONTAL_PADDING,
@@ -44,6 +58,7 @@ export function buildNavBarContainerStyle(): NavBarContainerStyle {
 export function buildNavBarLeadingSlotStyle(): NavBarSlotStyle {
   return {
     width: NAV_BAR_SLOT_WIDTH,
+    minHeight: NAV_BAR_SLOT_MIN_HIT,
     alignItems: 'flex-start',
     justifyContent: 'center',
   };
@@ -52,6 +67,7 @@ export function buildNavBarLeadingSlotStyle(): NavBarSlotStyle {
 export function buildNavBarTrailingSlotStyle(): NavBarSlotStyle {
   return {
     width: NAV_BAR_SLOT_WIDTH,
+    minHeight: NAV_BAR_SLOT_MIN_HIT,
     alignItems: 'flex-end',
     justifyContent: 'center',
   };

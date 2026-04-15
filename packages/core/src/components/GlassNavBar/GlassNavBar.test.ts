@@ -11,6 +11,7 @@ import { describe, expect, test } from 'vitest';
 import {
   NAV_BAR_HEIGHT,
   NAV_BAR_HORIZONTAL_PADDING,
+  NAV_BAR_SLOT_MIN_HIT,
   NAV_BAR_SLOT_WIDTH,
   buildNavBarContainerStyle,
   buildNavBarLeadingSlotStyle,
@@ -33,9 +34,12 @@ describe('buildNavBarContainerStyle', () => {
     expect(style.alignItems).toBe('center');
   });
 
-  test('container height matches the NAV_BAR_HEIGHT constant (56)', () => {
+  test('container uses minHeight so the bar can grow with Dynamic Type', () => {
     expect(NAV_BAR_HEIGHT).toBe(56);
-    expect(style.height).toBe(NAV_BAR_HEIGHT);
+    expect(style.minHeight).toBe(NAV_BAR_HEIGHT);
+    // A hard `height` would trap the title at 56pt regardless of font
+    // scale. The helper must expose only `minHeight`.
+    expect((style as Record<string, unknown>).height).toBeUndefined();
   });
 
   test('uses NAV_BAR_HORIZONTAL_PADDING (12) for left/right gutters', () => {
@@ -52,6 +56,11 @@ describe('buildNavBarLeadingSlotStyle', () => {
     expect(style.alignItems).toBe('flex-start');
     expect(style.justifyContent).toBe('center');
   });
+
+  test('enforces the 44pt hit target floor on its children', () => {
+    expect(NAV_BAR_SLOT_MIN_HIT).toBe(44);
+    expect(style.minHeight).toBe(NAV_BAR_SLOT_MIN_HIT);
+  });
 });
 
 describe('buildNavBarTrailingSlotStyle', () => {
@@ -61,6 +70,10 @@ describe('buildNavBarTrailingSlotStyle', () => {
     expect(style.width).toBe(NAV_BAR_SLOT_WIDTH);
     expect(style.alignItems).toBe('flex-end');
     expect(style.justifyContent).toBe('center');
+  });
+
+  test('enforces the 44pt hit target floor on its children', () => {
+    expect(style.minHeight).toBe(NAV_BAR_SLOT_MIN_HIT);
   });
 });
 
