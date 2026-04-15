@@ -75,7 +75,14 @@ describe('buildCardTitleStyle across personality themes', () => {
     expect(style.color).toBe(theme.colors.textPrimary);
     expect(style.fontSize).toBe(18);
     expect(style.fontWeight).toBe('600');
-    expect(style.lineHeight).toBe(24);
+  });
+
+  test('does not hard-code lineHeight (Dynamic Type safety)', () => {
+    // Setting a fixed lineHeight would clip glyphs when the user
+    // enlarges system font size — RN does not scale lineHeight
+    // even when fontScale scales fontSize. The helper omits it.
+    const style = buildCardTitleStyle('#000') as Record<string, unknown>;
+    expect(style.lineHeight).toBeUndefined();
   });
 });
 
@@ -85,7 +92,11 @@ describe('buildCardSubtitleStyle across personality themes', () => {
     expect(style.color).toBe(theme.colors.textSecondary);
     expect(style.fontSize).toBe(14);
     expect(style.fontWeight).toBe('400');
-    expect(style.lineHeight).toBe(20);
+  });
+
+  test('does not hard-code lineHeight (Dynamic Type safety)', () => {
+    const style = buildCardSubtitleStyle('#000') as Record<string, unknown>;
+    expect(style.lineHeight).toBeUndefined();
   });
 });
 

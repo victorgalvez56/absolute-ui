@@ -95,7 +95,11 @@ function GlassCardHeader({ title, subtitle, trailing }: GlassCardHeaderProps) {
       style={{
         ...headerStyle,
         flexDirection: 'row',
-        alignItems: 'center',
+        // flex-start (not center) so the trailing node stays anchored
+        // to the top of the row when the title wraps at large Dynamic
+        // Type sizes. Center alignment would visually collide with
+        // multi-line titles.
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
       }}
     >

@@ -17,18 +17,26 @@ export type CardFooterStyle = CardSectionStyle & {
   alignItems: 'center';
 };
 
+/**
+ * React Native does NOT scale `lineHeight` with the user's Dynamic
+ * Type / font scale — only `fontSize` is multiplied at render time.
+ * Setting a hard `lineHeight` therefore clips glyph ascenders and
+ * descenders when the user enlarges system text. The fix is to
+ * omit `lineHeight` entirely and let the Text layer use its
+ * built-in default (roughly fontSize * 1.2 across platforms),
+ * which scales naturally. Exposed here as a type comment so a
+ * future agent auditing the helpers can see the reasoning.
+ */
 export type CardTitleStyle = {
   color: string;
   fontSize: number;
   fontWeight: '600';
-  lineHeight: number;
 };
 
 export type CardSubtitleStyle = {
   color: string;
   fontSize: number;
   fontWeight: '400';
-  lineHeight: number;
 };
 
 export type CardDividerStyle = {
@@ -73,7 +81,6 @@ export function buildCardTitleStyle(textPrimary: string): CardTitleStyle {
     color: textPrimary,
     fontSize: 18,
     fontWeight: '600',
-    lineHeight: 24,
   };
 }
 
@@ -82,7 +89,6 @@ export function buildCardSubtitleStyle(textSecondary: string): CardSubtitleStyle
     color: textSecondary,
     fontSize: 14,
     fontWeight: '400',
-    lineHeight: 20,
   };
 }
 
