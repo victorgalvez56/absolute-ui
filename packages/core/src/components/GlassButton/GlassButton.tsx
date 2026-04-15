@@ -3,6 +3,13 @@ import { forwardRef, useCallback } from 'react';
 import { Pressable, type PressableStateCallbackType, Text, type ViewStyle } from 'react-native';
 import { useAbsoluteUI } from '../../theme-context.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
+import {
+  buildGlassButtonPressableStyle,
+  buildGlassButtonTextStyle,
+  isGlassButtonInteractive,
+  resolveGlassButtonAccessibilityLabel,
+  shouldWrapChildInText,
+} from './style.js';
 
 export type GlassButtonProps = {
   /**
@@ -47,8 +54,6 @@ export type GlassButtonProps = {
   children: ReactNode;
 };
 
-const MIN_HIT_TARGET = 44;
-
 /**
  * Interactive liquid-glass button. Composes a GlassSurface as its
  * outer container and wraps a Pressable inside so the press target,
@@ -61,6 +66,10 @@ const MIN_HIT_TARGET = 44;
  * animating; Phase 1 keeps this minimal so Reduced Motion is a
  * no-op. A richer spring-based interaction arrives with the
  * motion layer in Phase 2.
+ *
+ * All non-JSX behavior (pressable style, text-wrap decision,
+ * interactivity, a11y label fallback) lives in `./style.ts` so
+ * the node-only vitest suite can exercise it without a DOM.
  */
 export const GlassButton = forwardRef<unknown, GlassButtonProps>(function GlassButton(
   {
@@ -76,39 +85,21 @@ export const GlassButton = forwardRef<unknown, GlassButtonProps>(function GlassB
   _ref,
 ) {
   const { theme } = useAbsoluteUI();
-  const isInteractive = !disabled && onPress !== undefined;
+  const interactive = isGlassButtonInteractive({
+    disabled,
+    hasOnPress: onPress !== undefined,
+  });
 
-  // When the child is a plain string, wrap it in a themed Text node
-  // so callers don't have to build typography by hand for the common
-  // case. Richer compositions (icons, badges) pass their own nodes.
   const renderContent = useCallback(() => {
-    if (typeof children === 'string') {
-      return (
-        <Text
-          style={{
-            color: theme.colors.textPrimary,
-            fontSize: 16,
-            fontWeight: '600',
-            textAlign: 'center',
-          }}
-        >
-          {children}
-        </Text>
-      );
+    if (shouldWrapChildInText(children)) {
+      return <Text style={buildGlassButtonTextStyle(theme.colors.textPrimary)}>{children}</Text>;
     }
     return children;
   }, [children, theme]);
 
   const pressableStyle = useCallback(
-    ({ pressed }: PressableStateCallbackType): ViewStyle => ({
-      minWidth: MIN_HIT_TARGET,
-      minHeight: MIN_HIT_TARGET,
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-      opacity: disabled ? 0.4 : pressed ? 0.7 : 1,
-    }),
+    ({ pressed }: PressableStateCallbackType): ViewStyle =>
+      buildGlassButtonPressableStyle({ pressed, disabled }),
     [disabled],
   );
 
@@ -116,12 +107,13 @@ export const GlassButton = forwardRef<unknown, GlassButtonProps>(function GlassB
     <GlassSurface elevation={elevation} radius={radius} style={style} accessibilityRole="none">
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={
-          accessibilityLabel ?? (typeof children === 'string' ? children : undefined)
-        }
+        accessibilityLabel={resolveGlassButtonAccessibilityLabel({
+          accessibilityLabel,
+          child: children,
+        })}
         accessibilityHint={accessibilityHint}
-        accessibilityState={{ disabled: !isInteractive }}
-        disabled={!isInteractive}
+        accessibilityState={{ disabled: !interactive }}
+        disabled={!interactive}
         onPress={onPress}
         hitSlop={0}
         style={pressableStyle}
