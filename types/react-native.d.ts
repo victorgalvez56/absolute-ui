@@ -46,6 +46,7 @@ declare module 'react-native' {
     accessibilityState?: AccessibilityState;
     accessible?: boolean;
     testID?: string;
+    pointerEvents?: 'auto' | 'none' | 'box-none' | 'box-only';
     ref?: Ref<unknown>;
   };
 

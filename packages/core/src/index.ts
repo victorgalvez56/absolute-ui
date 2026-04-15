@@ -36,3 +36,10 @@ export type { GlassTabBarItem, GlassTabBarProps } from './components/GlassTabBar
 
 export { GlassModal } from './components/GlassModal/index.js';
 export type { GlassModalProps } from './components/GlassModal/index.js';
+
+export { GlassToast } from './components/GlassToast/index.js';
+export type {
+  GlassToastProps,
+  ToastPosition,
+  ToastVariant,
+} from './components/GlassToast/index.js';
