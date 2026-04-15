@@ -19,10 +19,15 @@
     "react": ">=18.3.0",
     "react-native": ">=0.76.0"
   },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "react": "^18.3.1",
-    "react-native": "^0.76.5"
+    "react-native-web": "^0.19.13"
   },
   "publishConfig": {
     "access": "public"

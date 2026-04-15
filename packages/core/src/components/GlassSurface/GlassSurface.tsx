@@ -38,7 +38,7 @@ export type GlassSurfaceProps = Omit<ViewProps, 'style'> & {
  * component (`GlassCard`, `GlassButton`, `GlassSheet`, …) composes
  * a `GlassSurface` as its outer container.
  */
-export const GlassSurface = forwardRef<View, GlassSurfaceProps>(function GlassSurface(
+export const GlassSurface = forwardRef<unknown, GlassSurfaceProps>(function GlassSurface(
   {
     elevation = 1,
     radius = 'md',

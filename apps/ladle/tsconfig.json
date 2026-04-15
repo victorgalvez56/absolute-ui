@@ -6,6 +6,6 @@
     "moduleResolution": "Bundler",
     "noEmit": true
   },
-  "include": ["src/**/*", ".ladle/**/*"],
+  "include": ["src/**/*", ".ladle/**/*", "../../types/**/*"],
   "exclude": ["node_modules", "build"]
 }
