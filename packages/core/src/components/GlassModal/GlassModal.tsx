@@ -51,7 +51,12 @@ export const GlassModal = forwardRef<unknown, GlassModalProps>(function GlassMod
   const titleStyle = buildModalTitleStyle(theme.colors.textPrimary);
   const descriptionStyle = buildModalDescriptionStyle(theme.colors.textSecondary);
 
-  const fallbackLabel = title ?? accessibilityLabel;
+  // When a `title` is present, the header Text inside the surface
+  // is the accessible name — setting the same label on the wrapper
+  // would duplicate the announcement. Use `accessibilityLabel` only
+  // as a fallback for title-less dialogs.
+  const wrapperLabel = title !== undefined ? undefined : accessibilityLabel;
+  const wrapperLabelProps = wrapperLabel !== undefined ? { accessibilityLabel: wrapperLabel } : {};
 
   return (
     <View style={overlayStyle}>
@@ -61,7 +66,7 @@ export const GlassModal = forwardRef<unknown, GlassModalProps>(function GlassMod
         accessibilityRole="button"
         accessibilityLabel="Dismiss dialog"
       />
-      <View accessibilityLabel={fallbackLabel} accessibilityRole="none">
+      <View accessibilityRole="none" {...wrapperLabelProps}>
         <GlassSurface elevation={3} radius="xl" style={surfaceStyle}>
           {title !== undefined ? (
             <Text style={titleStyle} accessibilityRole="header">

@@ -76,7 +76,16 @@ declare module 'react-native' {
     children?: ReactNode | ((state: PressableStateCallbackType) => ReactNode);
   };
 
+  export type ScrollViewProps = ViewProps & {
+    contentContainerStyle?: ViewStyle;
+    horizontal?: boolean;
+    showsHorizontalScrollIndicator?: boolean;
+    showsVerticalScrollIndicator?: boolean;
+    bounces?: boolean;
+  };
+
   export const View: ComponentType<ViewProps>;
   export const Text: ComponentType<TextProps>;
   export const Pressable: ComponentType<PressableProps>;
+  export const ScrollView: ComponentType<ScrollViewProps>;
 }

@@ -29,6 +29,13 @@ export type ModalBackdropStyle = {
 export type ModalSurfaceStyle = {
   width: '100%';
   maxWidth: number;
+  /**
+   * Cap the surface at 80% of the viewport so long descriptions
+   * don't blow past the top/bottom edge at large Dynamic Type or
+   * 200% screen zoom. The inner content region uses a ScrollView
+   * which claims whatever height is left under this cap.
+   */
+  maxHeight: string;
   padding: number;
   gap: number;
 };
@@ -80,6 +87,7 @@ export function buildModalSurfaceStyle(): ModalSurfaceStyle {
   return {
     width: '100%',
     maxWidth: MODAL_SURFACE_MAX_WIDTH,
+    maxHeight: '80%',
     padding: MODAL_SURFACE_PADDING,
     gap: MODAL_SURFACE_GAP,
   };
