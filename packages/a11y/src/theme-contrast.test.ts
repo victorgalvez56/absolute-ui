@@ -74,3 +74,24 @@ describe('theme contrast on composited elevation-2 surfaces', () => {
     expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
   });
 });
+
+/**
+ * Elevation 3 is the reserved slot for modal-adjacent surfaces —
+ * GlassSheet, GlassModal — and carries the heaviest tint. These
+ * are the surfaces users read longest (dialogs, confirmations,
+ * settings sheets), so failing the contract here is the most
+ * visible regression.
+ */
+describe('theme contrast on composited elevation-3 surfaces', () => {
+  test.each(themes)('%s textPrimary meets the body contrast floor', (_name, theme) => {
+    const surface = composite(theme.glass[3].tint, theme.colors.background);
+    const lc = apcaContrast(theme.colors.textPrimary, surface);
+    expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
+  });
+
+  test.each(themes)('%s textSecondary meets the body contrast floor', (_name, theme) => {
+    const surface = composite(theme.glass[3].tint, theme.colors.background);
+    const lc = apcaContrast(theme.colors.textSecondary, surface);
+    expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
+  });
+});
