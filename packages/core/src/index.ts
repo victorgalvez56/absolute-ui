@@ -27,3 +27,6 @@ export type {
 
 export { GlassSheet } from './components/GlassSheet/index.js';
 export type { GlassSheetProps } from './components/GlassSheet/index.js';
+
+export { GlassNavBar } from './components/GlassNavBar/index.js';
+export type { GlassNavBarProps } from './components/GlassNavBar/index.js';
