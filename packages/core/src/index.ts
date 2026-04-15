@@ -33,3 +33,6 @@ export type { GlassNavBarProps } from './components/GlassNavBar/index.js';
 
 export { GlassTabBar } from './components/GlassTabBar/index.js';
 export type { GlassTabBarItem, GlassTabBarProps } from './components/GlassTabBar/index.js';
+
+export { GlassModal } from './components/GlassModal/index.js';
+export type { GlassModalProps } from './components/GlassModal/index.js';
