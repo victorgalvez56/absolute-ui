@@ -8,13 +8,15 @@
  * you reach for a new RN API, add its types here.
  */
 declare module 'react-native' {
-  import type { ComponentType, CSSProperties, Ref, ReactNode } from 'react';
+  import type { ComponentType, CSSProperties, ReactNode, Ref } from 'react';
 
   export type ViewStyle = CSSProperties & {
     // Extra fields used by GlassSurface on web that aren't in CSSProperties
     backdropFilter?: string;
     WebkitBackdropFilter?: string;
   };
+
+  export type TextStyle = ViewStyle;
 
   export type AccessibilityRole =
     | 'none'
@@ -27,15 +29,54 @@ declare module 'react-native' {
     | 'list'
     | 'listitem';
 
+  export type AccessibilityState = {
+    disabled?: boolean;
+    selected?: boolean;
+    checked?: boolean | 'mixed';
+    busy?: boolean;
+    expanded?: boolean;
+  };
+
   export type ViewProps = {
     style?: ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>;
     children?: ReactNode;
     accessibilityRole?: AccessibilityRole;
     accessibilityLabel?: string;
+    accessibilityHint?: string;
+    accessibilityState?: AccessibilityState;
     accessible?: boolean;
     testID?: string;
     ref?: Ref<unknown>;
   };
 
+  export type TextProps = ViewProps & {
+    numberOfLines?: number;
+    allowFontScaling?: boolean;
+  };
+
+  export type PressableStateCallbackType = {
+    pressed: boolean;
+    hovered?: boolean;
+    focused?: boolean;
+  };
+
+  export type PressableProps = Omit<ViewProps, 'style' | 'children'> & {
+    onPress?: () => void;
+    onPressIn?: () => void;
+    onPressOut?: () => void;
+    onLongPress?: () => void;
+    disabled?: boolean;
+    hitSlop?: number | { top?: number; bottom?: number; left?: number; right?: number };
+    style?:
+      | ViewStyle
+      | ReadonlyArray<ViewStyle | false | null | undefined>
+      | ((
+          state: PressableStateCallbackType,
+        ) => ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>);
+    children?: ReactNode | ((state: PressableStateCallbackType) => ReactNode);
+  };
+
   export const View: ComponentType<ViewProps>;
+  export const Text: ComponentType<TextProps>;
+  export const Pressable: ComponentType<PressableProps>;
 }
