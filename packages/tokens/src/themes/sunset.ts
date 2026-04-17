@@ -13,6 +13,7 @@ export const sunset: Theme = {
     onAccent: palette.neutral0,
     focusRing: palette.amber400,
     divider: palette.amber400,
+    danger: palette.red600,
   },
   glass: {
     0: {

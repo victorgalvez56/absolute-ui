@@ -21,6 +21,13 @@ export type ThemeColors = {
   focusRing: string;
   /** Divider / hairline color. */
   divider: string;
+  /**
+   * Danger / error color. Used by inputs for the invalid ring and by
+   * destructive controls for their accent. Must meet |Lc| >= 60 on
+   * every elevation composited with the theme background — enforced
+   * by the `@absolute-ui/a11y` theme-contrast regression suite.
+   */
+  danger: string;
 };
 
 /**

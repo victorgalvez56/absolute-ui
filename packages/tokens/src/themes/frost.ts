@@ -13,6 +13,7 @@ export const frost: Theme = {
     onAccent: palette.neutral0,
     focusRing: palette.ice400,
     divider: palette.neutral200,
+    danger: palette.red600,
   },
   glass: {
     0: {

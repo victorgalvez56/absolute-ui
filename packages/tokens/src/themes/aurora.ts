@@ -13,6 +13,7 @@ export const aurora: Theme = {
     onAccent: palette.neutral900,
     focusRing: palette.aurora200,
     divider: palette.neutral700,
+    danger: palette.red200,
   },
   glass: {
     0: {

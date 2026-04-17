@@ -13,6 +13,7 @@ export const obsidian: Theme = {
     onAccent: palette.neutral0,
     focusRing: palette.indigo200,
     divider: palette.neutral800,
+    danger: palette.red200,
   },
   glass: {
     0: {

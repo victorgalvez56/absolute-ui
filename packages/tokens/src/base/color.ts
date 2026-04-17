@@ -51,6 +51,17 @@ export const palette = {
   coral200: '#FFD0C2',
   coral400: '#FF785C',
   coral600: '#C4361A',
+
+  // Danger — shared across all themes, indexed by lightness.
+  // Dark themes pick red200 (light red on dark composite);
+  // light themes pick red600 (deep red on light composite). The
+  // red600 stop sits at Tailwind red-900 (#7F1D1D) rather than the
+  // more conventional red-700 (#B91C1C) because Sunset's warm amber
+  // tint fails the APCA Lc 60 floor at elevations 2-3 with a lighter
+  // red; the deeper stop clears every light theme with headroom.
+  red200: '#FFB8B8',
+  red400: '#FF5252',
+  red600: '#7F1D1D',
 } as const;
 
 export type PaletteToken = keyof typeof palette;

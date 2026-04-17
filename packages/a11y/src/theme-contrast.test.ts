@@ -95,3 +95,24 @@ describe('theme contrast on composited elevation-3 surfaces', () => {
     expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
   });
 });
+
+/**
+ * Danger role — used by GlassInput's error ring/helper text, and by
+ * destructive controls. Runs against every composited elevation the
+ * design system actually renders on, so an invalid input sitting on a
+ * nested card (elevation 2) or a modal (elevation 3) is never
+ * announced as error-colored while failing the readability floor.
+ */
+describe('theme contrast: danger', () => {
+  const elevations = [1, 2, 3] as const;
+  for (const elevation of elevations) {
+    test.each(themes)(
+      `%s danger meets the body contrast floor at elev ${elevation}`,
+      (_name, theme) => {
+        const surface = composite(theme.glass[elevation].tint, theme.colors.background);
+        const lc = apcaContrast(theme.colors.danger, surface);
+        expect(Math.abs(lc)).toBeGreaterThanOrEqual(MIN_BODY_LC);
+      },
+    );
+  }
+});
