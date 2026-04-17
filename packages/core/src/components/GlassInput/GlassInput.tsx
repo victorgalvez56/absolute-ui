@@ -169,7 +169,7 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
   }, [onBlur]);
 
   const interactive = isGlassInputInteractive({ disabled, editable });
-  const errorColor = theme.colors.focusRing; // palette lacks a dedicated danger token in Phase 3; reuse focusRing-strong until the tokens package ships a `danger` role. Tracked as Phase 3 debt.
+  const errorColor = theme.colors.danger;
   const containerStyle = buildGlassInputContainerStyle({
     focused,
     disabled,
