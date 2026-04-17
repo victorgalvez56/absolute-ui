@@ -27,7 +27,10 @@ declare module 'react-native' {
     | 'text'
     | 'summary'
     | 'list'
-    | 'listitem';
+    | 'listitem'
+    | 'switch'
+    | 'checkbox'
+    | 'adjustable';
 
   export type AccessibilityState = {
     disabled?: boolean;
