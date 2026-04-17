@@ -40,6 +40,25 @@ declare module 'react-native' {
     expanded?: boolean;
   };
 
+  export type AccessibilityValue = {
+    min?: number;
+    max?: number;
+    now?: number;
+    text?: string;
+  };
+
+  export type LayoutChangeEvent = {
+    nativeEvent: {
+      layout: { x: number; y: number; width: number; height: number };
+    };
+  };
+
+  export type KeyboardEventLike = {
+    key: string;
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  };
+
   export type ViewProps = {
     style?: ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>;
     children?: ReactNode;
@@ -47,9 +66,12 @@ declare module 'react-native' {
     accessibilityLabel?: string;
     accessibilityHint?: string;
     accessibilityState?: AccessibilityState;
+    accessibilityValue?: AccessibilityValue;
     accessible?: boolean;
     testID?: string;
     pointerEvents?: 'auto' | 'none' | 'box-none' | 'box-only';
+    onLayout?: (event: LayoutChangeEvent) => void;
+    onKeyDown?: (event: KeyboardEventLike) => void;
     ref?: Ref<unknown>;
   };
 
