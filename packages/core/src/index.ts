@@ -52,3 +52,6 @@ export type { GlassSwitchProps } from './components/GlassSwitch/index.js';
 
 export { GlassSlider } from './components/GlassSlider/index.js';
 export type { GlassSliderProps } from './components/GlassSlider/index.js';
+
+export { GlassPicker } from './components/GlassPicker/index.js';
+export type { GlassPickerItem, GlassPickerProps } from './components/GlassPicker/index.js';

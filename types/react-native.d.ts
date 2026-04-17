@@ -30,7 +30,9 @@ declare module 'react-native' {
     | 'listitem'
     | 'switch'
     | 'checkbox'
-    | 'adjustable';
+    | 'adjustable'
+    | 'radio'
+    | 'radiogroup';
 
   export type AccessibilityState = {
     disabled?: boolean;
