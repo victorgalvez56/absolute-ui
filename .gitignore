@@ -24,6 +24,12 @@ web-build/
 # OS
 Thumbs.db
 
+# Claude Code agent workspaces (git worktrees nested in the repo)
+.claude/worktrees/
+
+# Session-local prompt logs
+2026-*.txt
+
 # Visual regression (Playwright) — ignore run artefacts but KEEP baselines.
 # Baselines live under `apps/visual/tests/**/*-snapshots/` and are committed.
 apps/visual/test-results/
