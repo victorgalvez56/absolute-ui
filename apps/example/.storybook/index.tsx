@@ -14,10 +14,10 @@
  * which is why `@react-native-async-storage/async-storage` is a
  * hard dependency of the storybook mode.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { defaultPreferences } from '@absolute-ui/a11y';
 import { AbsoluteUIContext } from '@absolute-ui/core';
 import { themes } from '@absolute-ui/tokens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { view } from './storybook.requires';

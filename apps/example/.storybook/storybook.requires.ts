@@ -32,7 +32,9 @@ const normalizedStories = [
 ];
 
 declare global {
-  var view: ReturnType<typeof start>;
+  // eslint-disable-next-line no-var
+  var storybookView: ReturnType<typeof start>;
+  // eslint-disable-next-line no-var
   var STORIES: typeof normalizedStories;
 }
 
@@ -47,13 +49,13 @@ global.STORIES = normalizedStories;
 // @ts-ignore
 module?.hot?.accept?.();
 
-if (!global.view) {
-  global.view = start({
+if (!global.storybookView) {
+  global.storybookView = start({
     annotations,
     storyEntries: normalizedStories,
   });
 } else {
-  updateView(global.view, annotations, normalizedStories);
+  updateView(global.storybookView, annotations, normalizedStories);
 }
 
-export const view = global.view;
+export const view = global.storybookView;
