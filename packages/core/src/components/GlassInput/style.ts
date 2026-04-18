@@ -27,11 +27,67 @@ export const FOCUS_RING_OFFSET = 2;
  */
 export const ERROR_RING_WIDTH = 2;
 
+export type GlassInputSize = 'sm' | 'md' | 'lg';
+
+export type GlassInputSizeTokens = {
+  paddingHorizontal: number;
+  paddingVertical: number;
+  fontSize: number;
+  labelFontSize: number;
+  helperFontSize: number;
+  /** Icon glyph size, in dp. Used by leading / trailing icon slots. */
+  iconSize: number;
+  /** Gap between icon and input text. */
+  gap: number;
+};
+
+/**
+ * Resolve size-dependent geometry for the input. The 44pt minimum
+ * height is preserved at every size via the container builder, so
+ * `sm` shrinks padding + font without ever shrinking the hit target.
+ */
+export function resolveGlassInputSize(size: GlassInputSize = 'md'): GlassInputSizeTokens {
+  if (size === 'sm') {
+    return {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      fontSize: 14,
+      labelFontSize: 12,
+      helperFontSize: 11,
+      iconSize: 16,
+      gap: 6,
+    };
+  }
+  if (size === 'lg') {
+    return {
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      fontSize: 18,
+      labelFontSize: 14,
+      helperFontSize: 13,
+      iconSize: 22,
+      gap: 12,
+    };
+  }
+  return {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    labelFontSize: 13,
+    helperFontSize: 12,
+    iconSize: 18,
+    gap: 8,
+  };
+}
+
 export type GlassInputContainerStyle = {
   minHeight: number;
   paddingHorizontal: number;
   paddingVertical: number;
   justifyContent: 'center';
+  flexDirection: 'row';
+  alignItems: 'center';
+  gap: number;
   opacity: number;
   outlineStyle: 'solid' | 'none';
   outlineWidth: number;
@@ -81,13 +137,18 @@ export function buildGlassInputContainerStyle(options: {
   invalid: boolean;
   focusRingColor: string;
   errorColor: string;
+  size?: GlassInputSize;
 }): GlassInputContainerStyle {
-  const { focused, disabled, invalid, focusRingColor, errorColor } = options;
+  const { focused, disabled, invalid, focusRingColor, errorColor, size = 'md' } = options;
+  const s = resolveGlassInputSize(size);
   const base: GlassInputContainerStyle = {
     minHeight: MIN_HIT_TARGET,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: s.paddingHorizontal,
+    paddingVertical: s.paddingVertical,
     justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s.gap,
     opacity: disabled ? 0.4 : 1,
     outlineStyle: 'none',
     outlineWidth: 0,
@@ -122,12 +183,18 @@ export function buildGlassInputContainerStyle(options: {
  * up to the 200% accessibility size from clipping inside the 44pt
  * container.
  */
-export function buildGlassInputTextStyle(textPrimary: string): GlassInputTextStyle {
+export function buildGlassInputTextStyle(
+  textPrimary: string,
+  size: GlassInputSize = 'md',
+): GlassInputTextStyle {
+  const s = resolveGlassInputSize(size);
   return {
     color: textPrimary,
-    fontSize: 16,
+    fontSize: s.fontSize,
     fontWeight: '400',
-    lineHeight: 22,
+    // lineHeight must grow proportionally to fontSize so Dynamic Type
+    // at 200% doesn't clip glyph ascenders inside the 44pt container.
+    lineHeight: Math.round(s.fontSize * 1.375),
   };
 }
 
@@ -144,10 +211,13 @@ export function resolveGlassInputPlaceholderColor(textSecondary: string): string
  * Label rendered above the input when the caller passes `label`.
  * Bold (600) so it visually outranks helper/error text below the field.
  */
-export function buildGlassInputLabelStyle(textPrimary: string): GlassInputLabelStyle {
+export function buildGlassInputLabelStyle(
+  textPrimary: string,
+  size: GlassInputSize = 'md',
+): GlassInputLabelStyle {
   return {
     color: textPrimary,
-    fontSize: 13,
+    fontSize: resolveGlassInputSize(size).labelFontSize,
     fontWeight: '600',
     marginBottom: 6,
   };
@@ -162,10 +232,11 @@ export function buildGlassInputHelperStyle(options: {
   textSecondary: string;
   errorColor: string;
   invalid: boolean;
+  size?: GlassInputSize;
 }): GlassInputHelperStyle {
   return {
     color: options.invalid ? options.errorColor : options.textSecondary,
-    fontSize: 12,
+    fontSize: resolveGlassInputSize(options.size ?? 'md').helperFontSize,
     fontWeight: '400',
     marginTop: 6,
   };

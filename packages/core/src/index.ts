@@ -40,6 +40,9 @@ export type {
   GlassCardBodyProps,
   GlassCardFooterProps,
   GlassCardDividerProps,
+  GlassCardVariant,
+  GlassCardAction,
+  GlassCardSize,
 } from './components/GlassCard/index.js';
 
 export { GlassSheet } from './components/GlassSheet/index.js';
@@ -62,7 +65,7 @@ export type {
 } from './components/GlassToast/index.js';
 
 export { GlassInput } from './components/GlassInput/index.js';
-export type { GlassInputProps } from './components/GlassInput/index.js';
+export type { GlassInputProps, GlassInputSize } from './components/GlassInput/index.js';
 
 export { GlassSwitch } from './components/GlassSwitch/index.js';
 export type { GlassSwitchProps } from './components/GlassSwitch/index.js';

@@ -18,7 +18,9 @@
       "apps/docs/next-env.d.ts",
       "apps/example/ios/**",
       "apps/example/android/**",
-      "apps/example/__tests__/**"
+      "apps/example/__tests__/**",
+      "apps/example/.storybook/storybook.requires.ts",
+      "apps/ladle/public/**"
     ]
   },
   "formatter": {

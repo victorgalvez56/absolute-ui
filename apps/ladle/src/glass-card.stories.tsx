@@ -1,5 +1,13 @@
 import { defaultPreferences } from '@absolute-ui/a11y';
-import { AbsoluteUIContext, GlassButton, GlassCard } from '@absolute-ui/core';
+import {
+  AbsoluteUIContext,
+  GlassButton,
+  GlassCard,
+  type GlassCardAction,
+  type GlassCardVariant,
+  HStack,
+  VStack,
+} from '@absolute-ui/core';
 import { type Theme, themes } from '@absolute-ui/tokens';
 import { Text } from 'react-native';
 
@@ -103,6 +111,83 @@ export const WithTrailing = () => (
           </Text>
         </GlassCard.Body>
       </GlassCard>
+    </Backdrop>
+  </AbsoluteUIContext.Provider>
+);
+
+/* ---------- New: variants × actions ---------- */
+
+const CARD_VARIANTS: GlassCardVariant[] = ['filled', 'soft', 'outline', 'ghost'];
+const CARD_ACTIONS: GlassCardAction[] = ['neutral', 'primary', 'danger'];
+
+export const VariantMatrix = () => (
+  <AbsoluteUIContext.Provider value={{ theme: themes.obsidian, preferences: defaultPreferences }}>
+    <Backdrop theme={themes.obsidian}>
+      <VStack gap="lg" alignItems="stretch">
+        {CARD_ACTIONS.map((action) => (
+          <VStack key={action} gap="sm">
+            <Text
+              style={{
+                color: themes.obsidian.colors.textSecondary,
+                fontSize: 11,
+                fontWeight: '600',
+              }}
+            >
+              {`action: ${action}`.toUpperCase()}
+            </Text>
+            <HStack gap="md" alignItems="stretch">
+              {CARD_VARIANTS.map((variant) => (
+                <GlassCard
+                  key={variant}
+                  variant={variant}
+                  action={action}
+                  style={{ flex: 1, minWidth: 180 }}
+                >
+                  <GlassCard.Header title={variant} subtitle={`action: ${action}`} />
+                  <GlassCard.Body>
+                    <Text style={{ color: themes.obsidian.colors.textSecondary, fontSize: 13 }}>
+                      Short body copy.
+                    </Text>
+                  </GlassCard.Body>
+                </GlassCard>
+              ))}
+            </HStack>
+          </VStack>
+        ))}
+      </VStack>
+    </Backdrop>
+  </AbsoluteUIContext.Provider>
+);
+
+/* ---------- Sizes ---------- */
+
+export const Sizes = () => (
+  <AbsoluteUIContext.Provider value={{ theme: themes.frost, preferences: defaultPreferences }}>
+    <Backdrop theme={themes.frost}>
+      <HStack gap="md" alignItems="flex-start">
+        {(['sm', 'md', 'lg'] as const).map((size) => (
+          <GlassCard key={size} size={size} style={{ flex: 1 }}>
+            <GlassCard.Header title={`Card ${size}`} subtitle="Shared body copy" />
+            <GlassCard.Divider />
+            <GlassCard.Body>
+              <Text style={{ color: themes.frost.colors.textSecondary, fontSize: 13 }}>
+                Padding + title scale with the size token.
+              </Text>
+            </GlassCard.Body>
+            <GlassCard.Footer>
+              <GlassButton
+                size={size}
+                action="primary"
+                variant="solid"
+                accessibilityLabel={`Confirm ${size}`}
+                onPress={() => {}}
+              >
+                Confirm
+              </GlassButton>
+            </GlassCard.Footer>
+          </GlassCard>
+        ))}
+      </HStack>
     </Backdrop>
   </AbsoluteUIContext.Provider>
 );

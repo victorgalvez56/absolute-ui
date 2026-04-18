@@ -98,10 +98,7 @@ declare module 'react-native' {
     onPressOut?: (() => void) | undefined;
     onLongPress?: (() => void) | undefined;
     disabled?: boolean | undefined;
-    hitSlop?:
-      | number
-      | { top?: number; bottom?: number; left?: number; right?: number }
-      | undefined;
+    hitSlop?: number | { top?: number; bottom?: number; left?: number; right?: number } | undefined;
     style?:
       | ViewStyle
       | ReadonlyArray<ViewStyle | false | null | undefined>

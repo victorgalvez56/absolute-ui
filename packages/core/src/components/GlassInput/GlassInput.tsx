@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { forwardRef, useCallback, useState } from 'react';
 import {
   Text,
@@ -10,6 +11,7 @@ import {
 import { useAbsoluteUI } from '../../theme-context.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
 import {
+  type GlassInputSize,
   buildGlassInputContainerStyle,
   buildGlassInputHelperStyle,
   buildGlassInputLabelStyle,
@@ -19,6 +21,7 @@ import {
   resolveGlassInputAccessibilityLabel,
   resolveGlassInputAccessibilityState,
   resolveGlassInputPlaceholderColor,
+  resolveGlassInputSize,
 } from './style.js';
 
 export type GlassInputProps = {
@@ -105,6 +108,25 @@ export type GlassInputProps = {
    * visual overrides — they bypass the theme contract.
    */
   style?: ViewStyle;
+  /**
+   * Size token. Controls container padding, text font, label font,
+   * helper font, and icon size. Default `md`. The 44pt minimum hit
+   * target is preserved at every size.
+   */
+  size?: GlassInputSize;
+  /**
+   * Leading slot rendered inside the surface, before the text input.
+   * Typically an icon glyph (search, user, lock, …). The slot is
+   * wrapped in a square box sized to the current `size` token so
+   * callers don't have to hard-code dimensions.
+   */
+  leadingIcon?: ReactNode;
+  /**
+   * Trailing slot rendered inside the surface, after the text input.
+   * Common uses: clear-input button, password visibility toggle,
+   * validation indicator. Same sizing contract as `leadingIcon`.
+   */
+  trailingIcon?: ReactNode;
 };
 
 /**
@@ -153,6 +175,9 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
     elevation = 1,
     radius = 'md',
     style,
+    size = 'md',
+    leadingIcon,
+    trailingIcon,
   },
   _ref,
 ) {
@@ -176,15 +201,34 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
     invalid,
     focusRingColor: theme.colors.focusRing,
     errorColor,
+    size,
   }) as unknown as ViewStyle;
-  const inputStyle = buildGlassInputTextStyle(theme.colors.textPrimary) as unknown as TextStyle;
+  const inputStyle = buildGlassInputTextStyle(
+    theme.colors.textPrimary,
+    size,
+  ) as unknown as TextStyle;
+  // `flex: 1` lets the TextInput expand to fill the row between any
+  // leading / trailing icon slots. Without it a single-icon layout
+  // would collapse the input to its intrinsic width.
+  const inputStyleWithFlex: TextStyle = { ...inputStyle, flex: 1 };
   const placeholderColor = resolveGlassInputPlaceholderColor(theme.colors.textSecondary);
-  const labelStyle = buildGlassInputLabelStyle(theme.colors.textPrimary) as unknown as TextStyle;
+  const labelStyle = buildGlassInputLabelStyle(
+    theme.colors.textPrimary,
+    size,
+  ) as unknown as TextStyle;
   const helperStyle = buildGlassInputHelperStyle({
     textSecondary: theme.colors.textSecondary,
     errorColor,
     invalid,
+    size,
   }) as unknown as TextStyle;
+  const iconSize = resolveGlassInputSize(size).iconSize;
+  const iconBoxStyle: ViewStyle = {
+    width: iconSize,
+    height: iconSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
 
   const resolvedLabel = resolveGlassInputAccessibilityLabel({
     accessibilityLabel,
@@ -204,6 +248,11 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
     <View style={style}>
       {label !== undefined ? <Text style={labelStyle}>{label}</Text> : null}
       <GlassSurface elevation={elevation} radius={radius} style={containerStyle}>
+        {leadingIcon !== undefined ? (
+          <View accessibilityRole="none" style={iconBoxStyle}>
+            {leadingIcon}
+          </View>
+        ) : null}
         <TextInput
           accessibilityLabel={resolvedLabel}
           accessibilityHint={resolvedHint}
@@ -225,8 +274,13 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
           onFocus={handleFocus}
           onBlur={handleBlur}
           onSubmitEditing={onSubmitEditing}
-          style={inputStyle}
+          style={inputStyleWithFlex}
         />
+        {trailingIcon !== undefined ? (
+          <View accessibilityRole="none" style={iconBoxStyle}>
+            {trailingIcon}
+          </View>
+        ) : null}
       </GlassSurface>
       {visibleHelper !== undefined ? <Text style={helperStyle}>{visibleHelper}</Text> : null}
     </View>

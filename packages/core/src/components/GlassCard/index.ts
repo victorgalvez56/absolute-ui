@@ -6,3 +6,10 @@ export type {
   GlassCardFooterProps,
   GlassCardDividerProps,
 } from './GlassCard.js';
+export type {
+  GlassCardVariant,
+  GlassCardAction,
+  GlassCardSize,
+  GlassCardColorTokens,
+  GlassCardSectionPadding,
+} from './style.js';

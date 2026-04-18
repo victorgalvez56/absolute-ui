@@ -19,6 +19,7 @@ import {
   resolveGlassInputAccessibilityLabel,
   resolveGlassInputAccessibilityState,
   resolveGlassInputPlaceholderColor,
+  resolveGlassInputSize,
 } from './style.js';
 
 const FOCUS = '#A6F0E0';
@@ -292,5 +293,56 @@ describe('resolveGlassInputAccessibilityState', () => {
     expect(resolveGlassInputAccessibilityState({ disabled: false, editable: false })).toEqual({
       disabled: true,
     });
+  });
+});
+
+describe('resolveGlassInputSize', () => {
+  test('md defaults match the Phase 1 baseline', () => {
+    const md = resolveGlassInputSize('md');
+    expect(md.paddingHorizontal).toBe(16);
+    expect(md.paddingVertical).toBe(12);
+    expect(md.fontSize).toBe(16);
+  });
+
+  test('sm shrinks padding + font; 44pt minHeight preserved by container', () => {
+    const sm = resolveGlassInputSize('sm');
+    expect(sm.paddingHorizontal).toBeLessThan(16);
+    expect(sm.fontSize).toBeLessThan(16);
+    const container = buildGlassInputContainerStyle({
+      focused: false,
+      disabled: false,
+      invalid: false,
+      focusRingColor: FOCUS,
+      errorColor: ERROR,
+      size: 'sm',
+    });
+    expect(container.minHeight).toBe(MIN_HIT_TARGET);
+  });
+
+  test('lg grows padding + font + icon size', () => {
+    const md = resolveGlassInputSize('md');
+    const lg = resolveGlassInputSize('lg');
+    expect(lg.paddingHorizontal).toBeGreaterThan(md.paddingHorizontal);
+    expect(lg.fontSize).toBeGreaterThan(md.fontSize);
+    expect(lg.iconSize).toBeGreaterThan(md.iconSize);
+  });
+
+  test('text lineHeight grows proportionally with fontSize', () => {
+    const sm = buildGlassInputTextStyle('#fff', 'sm');
+    const lg = buildGlassInputTextStyle('#fff', 'lg');
+    expect(sm.lineHeight).toBeLessThan(lg.lineHeight);
+  });
+
+  test('container is laid out as a row so icon slots align with the text', () => {
+    const style = buildGlassInputContainerStyle({
+      focused: false,
+      disabled: false,
+      invalid: false,
+      focusRingColor: FOCUS,
+      errorColor: ERROR,
+    });
+    expect(style.flexDirection).toBe('row');
+    expect(style.alignItems).toBe('center');
+    expect(style.gap).toBeGreaterThan(0);
   });
 });

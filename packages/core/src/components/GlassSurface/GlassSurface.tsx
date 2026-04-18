@@ -54,7 +54,7 @@ export const GlassSurface = forwardRef<unknown, GlassSurfaceProps>(function Glas
   const theme = themeOverride ?? ctx.theme;
   const rawRecipe = theme.glass[elevation];
   const recipe = resolveGlassRecipe(rawRecipe, ctx.preferences, theme.colors.background);
-  const resolved = buildGlassSurfaceStyle(recipe, radiusTokens[radius]) as ViewStyle;
+  const resolved = buildGlassSurfaceStyle(recipe, radiusTokens[radius], elevation) as ViewStyle;
 
   return (
     <View
