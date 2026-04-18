@@ -21,8 +21,11 @@ import { dirname } from 'node:path';
 // for dev but silently drops out during production builds. Pinning
 // the replacement to the absolute package root sidesteps that.
 const require = createRequire(import.meta.url);
-const reactNativeWebEntry = require.resolve('react-native-web');
 const reactNativeWebRoot = dirname(require.resolve('react-native-web/package.json'));
+// The package's "main" field points to the CJS build, which makes Vite
+// pre-bundle a UMD shape that doesn't surface named exports (`View`,
+// `Text`, etc.). The ESM build at `dist/index.js` exports them cleanly.
+const reactNativeWebEntry = `${reactNativeWebRoot}/dist/index.js`;
 
 export default {
   resolve: {
@@ -36,7 +39,7 @@ export default {
   },
   optimizeDeps: {
     exclude: ['react-native'],
-    include: ['react-native-web'],
+    include: ['react-native-web', 'msw', 'msw/browser'],
   },
   define: {
     __DEV__: JSON.stringify(true),
