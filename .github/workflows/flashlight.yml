@@ -1,0 +1,126 @@
+# Flashlight perf benchmark — Android runtime FPS/CPU/memory score.
+#
+# Why workflow_dispatch only?
+#   Booting an Android emulator on a GitHub-hosted macOS runner adds
+#   ~10min of wall time per job and burns macOS minutes at 10x the
+#   Linux rate. Running that on every PR is not justified yet. Trigger
+#   this manually from the Actions tab before merging perf-sensitive
+#   changes; iOS perf is covered by Reassure on every PR.
+#
+# The job:
+#   1. Boots a Pixel 6a API 34 emulator (reactivecircus/android-emulator-runner).
+#   2. Installs Flashlight via Homebrew (the upstream-supported path).
+#   3. Builds + installs the example app, then runs pnpm perf:flashlight,
+#      which drives the Maestro smoke flow while Flashlight samples.
+#   4. Uploads results/ JSON so the run is auditable after the fact.
+#   5. Diffs the new score against the committed baseline.json and
+#      fails the job if the delta exceeds the 3-point budget.
+
+name: Flashlight
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: flashlight · android runtime perf
+    # macOS runner because reactivecircus/android-emulator-runner needs
+    # KVM/HAXM, and Flashlight is distributed via brew.
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Flashlight
+        run: brew install bamlab/tap/flashlight
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+        continue-on-error: true
+
+      - name: Run Flashlight benchmark
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6a
+          avd-name: pixel6a-api34
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            # Build and install the example app on the booted emulator.
+            pnpm --dir apps/example android
+            # Drive the Maestro smoke flow under Flashlight sampling.
+            pnpm --dir apps/example perf:flashlight
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flashlight-results
+          path: apps/example/.flashlight/results/
+          retention-days: 30
+
+      # Regression gate. Flashlight does not (yet) ship an official
+      # action for score diffs, so we do a surgical jq compare: the
+      # latest run's averageScore vs. baseline.json. Fails the job if
+      # the drop exceeds 3 points per IMPLEMENTATION_PLAN.md §8.
+      - name: Score regression check (delta <= 3)
+        if: always()
+        run: |
+          set -euo pipefail
+          BASELINE="apps/example/.flashlight/results/baseline.json"
+          if [ ! -f "$BASELINE" ]; then
+            echo "::warning::No baseline.json checked in yet — skipping regression gate."
+            exit 0
+          fi
+
+          # Pick the newest non-baseline result.
+          LATEST=$(ls -t apps/example/.flashlight/results/*.json \
+            | grep -v baseline | head -n 1 || true)
+          if [ -z "$LATEST" ]; then
+            echo "::error::No Flashlight run output found to compare."
+            exit 1
+          fi
+
+          BASE_SCORE=$(jq '.averageScore // .score' "$BASELINE")
+          NEW_SCORE=$(jq '.averageScore // .score' "$LATEST")
+          DELTA=$(awk "BEGIN { print $BASE_SCORE - $NEW_SCORE }")
+          echo "baseline=$BASE_SCORE new=$NEW_SCORE delta=$DELTA"
+
+          # Fail if the new score is more than 3 points below baseline.
+          awk "BEGIN { exit ($DELTA > 3) ? 1 : 0 }" || {
+            echo "::error::Flashlight score regressed by $DELTA points (budget: 3)."
+            exit 1
+          }
