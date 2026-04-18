@@ -1,70 +1,40 @@
 /**
  * Absolute UI example app — entry point.
  *
- * Minimal scaffold: wraps the tree in an AbsoluteUIContext so the
- * primitives resolve their theme + a11y preferences, and renders a
- * GlassSurface smoke test to confirm the monorepo symlink to
- * @absolute-ui/core actually resolves under Metro's bundler.
- *
- * The richer "Showcase" screen that exercises every primitive +
- * theme switcher lives in ./src/screens/Showcase.tsx (added in the
- * next commit). Keeping App.tsx tiny here so hydration errors
- * surface as import failures instead of layout bugs.
+ * Wraps the Showcase tour in an AbsoluteUIContext so every primitive
+ * resolves its theme + a11y preferences, plus a tiny theme-cycler
+ * state driver so the trailing button in the nav bar can rotate
+ * through aurora / obsidian / frost / sunset at runtime. That's the
+ * on-device validation loop: tap, scroll, toggle, see each theme.
  */
 import { defaultPreferences } from '@absolute-ui/a11y';
 import { AbsoluteUIContext } from '@absolute-ui/core';
-import { themes } from '@absolute-ui/tokens';
-import { StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { type ThemeName, themes } from '@absolute-ui/tokens';
+import { useCallback, useMemo, useState } from 'react';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ShowcaseScreen, themeCycleOrder } from './src/ShowcaseScreen';
 
 function App() {
-  const isDark = useColorScheme() === 'dark';
-  const theme = isDark ? themes.obsidian : themes.frost;
+  const [themeName, setThemeName] = useState<ThemeName>('aurora');
+  const theme = useMemo(() => themes[themeName], [themeName]);
+
+  const cycleTheme = useCallback(() => {
+    setThemeName((current) => {
+      const index = themeCycleOrder.indexOf(current);
+      const next = themeCycleOrder[(index + 1) % themeCycleOrder.length];
+      return next ?? themeCycleOrder[0] ?? 'aurora';
+    });
+  }, []);
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={theme.dark ? 'light-content' : 'dark-content'} />
       <AbsoluteUIContext.Provider value={{ theme, preferences: defaultPreferences }}>
-        <AppContent />
+        <ShowcaseScreen theme={theme} onCycleTheme={cycleTheme} />
       </AbsoluteUIContext.Provider>
     </SafeAreaProvider>
   );
 }
-
-function AppContent() {
-  const insets = useSafeAreaInsets();
-  return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + 24,
-          paddingBottom: insets.bottom + 24,
-        },
-      ]}
-    >
-      <Text style={styles.title}>Absolute UI</Text>
-      <Text style={styles.subtitle}>Liquid glass design system — example app</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    backgroundColor: '#0b0b12',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  subtitle: {
-    color: '#9aa0b4',
-    fontSize: 14,
-    marginTop: 4,
-  },
-});
 
 export default App;
