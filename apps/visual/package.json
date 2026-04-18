@@ -1,0 +1,18 @@
+{
+  "name": "@absolute-ui/visual",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:update": "playwright test --update-snapshots",
+    "enumerate": "node --import tsx scripts/enumerate-stories.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
