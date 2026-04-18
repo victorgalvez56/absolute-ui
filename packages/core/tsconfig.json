@@ -6,5 +6,5 @@
     "composite": true
   },
   "include": ["src/**/*", "../../types/**/*"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "src/**/*.perf.tsx", "src/**/*.test.ts"]
 }
