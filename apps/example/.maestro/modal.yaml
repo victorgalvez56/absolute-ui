@@ -1,0 +1,32 @@
+# Modal flow — opens the Delete artwork modal twice: first dismisses
+# via Cancel, then re-opens and confirms via Delete. Both Cancel and
+# Delete close the modal in the showcase, so we end with the modal
+# dismissed.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Overlays"
+    direction: DOWN
+
+# First pass: open then Cancel.
+- tapOn: "Open modal"
+- assertVisible: "Delete artwork?"
+- assertVisible: "Cancel"
+- assertVisible: "Delete"
+
+- tapOn: "Cancel"
+- assertNotVisible: "Delete artwork?"
+
+# Second pass: open then Delete.
+- tapOn: "Open modal"
+- assertVisible: "Delete artwork?"
+
+- tapOn:
+    text: "Delete"
+- assertNotVisible: "Delete artwork?"
+- assertVisible: "Absolute UI"

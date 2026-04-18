@@ -1,0 +1,30 @@
+# Sheet flow — opens the Share sheet, asserts every share row is
+# visible, taps "Copy link", and verifies the sheet dismissed (the
+# title "Share with" should disappear).
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Open sheet"
+    direction: DOWN
+
+- tapOn: "Open sheet"
+- assertVisible: "Share with"
+
+# All four share rows should be rendered before we tap one.
+- assertVisible: "Messages"
+- assertVisible: "Mail"
+- assertVisible: "Copy link"
+- assertVisible: "Save to Files"
+
+- tapOn: "Copy link"
+
+# Sheet dismisses on row tap in the showcase, so the title and the
+# rows should no longer be on screen.
+- assertNotVisible: "Share with"
+- assertNotVisible: "Save to Files"
+- assertVisible: "Absolute UI"
