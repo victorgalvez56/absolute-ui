@@ -1,0 +1,30 @@
+# Switches flow — toggles Wi-Fi (default on) off then back on, and
+# Bluetooth (default off) on, off, and verifies each label remains
+# visible after every toggle. Idempotent: both switches end where they
+# started.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+# Scroll the Switch section into view (it sits below the Input).
+- scrollUntilVisible:
+    element:
+      text: "Wi-Fi"
+    direction: DOWN
+
+# Wi-Fi: starts on -> tap to off -> tap to on.
+- tapOn: "Wi-Fi"
+- assertVisible: "Wi-Fi"
+- tapOn: "Wi-Fi"
+- assertVisible: "Wi-Fi"
+
+# Bluetooth: starts off -> tap to on -> tap to off.
+- tapOn: "Bluetooth"
+- assertVisible: "Bluetooth"
+- tapOn: "Bluetooth"
+- assertVisible: "Bluetooth"
+
+# Sanity: Airplane mode label still rendered next to its siblings.
+- assertVisible: "Airplane mode"

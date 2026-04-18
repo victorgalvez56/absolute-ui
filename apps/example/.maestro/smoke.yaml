@@ -1,0 +1,25 @@
+# Smoke flow — launches the app, asserts the NavBar title renders, and
+# walks through the three bottom tabs (Components/Themes/About) so we
+# know the TabBar dispatches before we lean on heavier flows.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+# Bottom TabBar: each label doubles as the accessibility node, so
+# Maestro can match by visible text.
+- assertVisible: "Components"
+- assertVisible: "Themes"
+- assertVisible: "About"
+
+- tapOn: "Themes"
+- assertVisible: "Themes"
+
+- tapOn: "About"
+- assertVisible: "About"
+
+# Return to Components so the suite stays idempotent.
+- tapOn: "Components"
+- assertVisible: "Components"
+- assertVisible: "Absolute UI"
