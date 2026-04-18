@@ -9,6 +9,11 @@
  * the normal app's tree — each mode stays tree-shakable on its own.
  */
 
+// Must load before AppRegistry. react-native-gesture-handler patches
+// the native gesture-manager registration; Storybook React Native's
+// on-device UI shell swipes between story list and preview, so it
+// needs the handler ready before any RN root mounts.
+import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native';
 import { name as appName } from './app.json';
 

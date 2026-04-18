@@ -21,9 +21,13 @@
     "@absolute-ui/tokens": "workspace:*",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native/new-app-screen": "0.85.1",
+    "hoist-non-react-statics": "^3.3.2",
     "react": "19.2.3",
     "react-native": "0.85.1",
-    "react-native-safe-area-context": "^5.5.2"
+    "react-native-gesture-handler": "^2.20.0",
+    "react-native-reanimated": "^4.0.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-worklets": "^0.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

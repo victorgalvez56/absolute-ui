@@ -29,9 +29,38 @@ const config = {
       path.resolve(projectRoot, 'node_modules'),
       path.resolve(workspaceRoot, 'node_modules'),
     ],
-    // Don't let the resolver accidentally follow symlinks outside the
-    // workspace (e.g. pnpm's .pnpm store) and load duplicate React
-    // copies — that's the top cause of "Invalid hook call" on RN.
+    // Pin every single-instance dep to the app's copy so the workspace
+    // packages (@absolute-ui/core etc.) and the app render against the
+    // same React — the top cause of "dispatcher.useContext is null"
+    // and "Invalid hook call" in a pnpm monorepo.
+    extraNodeModules: new Proxy(
+      {},
+      {
+        // Proxy every bare-specifier lookup into apps/example/node_modules.
+        // pnpm's nested .pnpm/<pkg>@<ver>/node_modules layout means a
+        // library deep inside the store can't walk up the tree to reach
+        // the app's hoisted copies of react, hoist-non-react-statics,
+        // etc. The proxy defaults every miss to the app's node_modules
+        // so any bare specifier resolves there first.
+        get: (_target, name) => {
+          return path.resolve(projectRoot, 'node_modules', String(name));
+        },
+      },
+    ),
+    // Block every react copy outside apps/example/node_modules so the
+    // hierarchical lookup never lands on packages/core's own react@18
+    // symlink. Without this block, Metro's default resolver walks up
+    // from each file and finds core/node_modules/react before the
+    // extraNodeModules alias kicks in, producing two React instances
+    // in the same bundle → dispatcher.useContext is null.
+    blockList: [
+      new RegExp(
+        `${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react/.*`,
+      ),
+      new RegExp(
+        `${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react-native/.*`,
+      ),
+    ],
     disableHierarchicalLookup: false,
   },
 };
