@@ -112,12 +112,18 @@ importers:
       '@react-native/typescript-config':
         specifier: 0.85.1
         version: 0.85.1
+      '@storybook/addon-actions':
+        specifier: ^8.4.0
+        version: 8.6.18(storybook@8.6.18(prettier@2.8.8))
       '@storybook/addon-ondevice-actions':
         specifier: ^8.4.0
         version: 8.6.4(prettier@2.8.8)(react-native@0.85.1(@babel/core@7.29.0)(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/jest-preset@0.85.1(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.1(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(storybook@8.6.18(prettier@2.8.8))
       '@storybook/addon-ondevice-controls':
         specifier: ^8.4.0
         version: 8.6.4(2330f6e17d0dfcffe83357037dd2b570)
+      '@storybook/react':
+        specifier: ^8.4.0
+        version: 8.6.18(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(storybook@8.6.18(prettier@2.8.8))(typescript@5.9.3)
       '@storybook/react-native':
         specifier: ^8.4.0
         version: 8.6.4(65d9aea70b036d190df0c9381a6c0e1a)
