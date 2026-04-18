@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Reads `apps/ladle/build/meta.json` and emits the list of story IDs
@@ -51,8 +51,6 @@ function isMain(): boolean {
 
 if (isMain()) {
   const stories = loadStories();
-  // biome-ignore lint/suspicious/noConsole: this is a CLI entrypoint
-  console.log(JSON.stringify(stories, null, 2));
-  // biome-ignore lint/suspicious/noConsole: CLI summary
-  console.error(`# ${stories.length} stories enumerated`);
+  process.stdout.write(`${JSON.stringify(stories, null, 2)}\n`);
+  process.stderr.write(`# ${stories.length} stories enumerated\n`);
 }

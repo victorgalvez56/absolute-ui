@@ -11,18 +11,19 @@ import { loadStories } from '../scripts/enumerate-stories.ts';
 
 const stories = loadStories();
 
-test.describe.parallel('ladle stories', () => {
-  for (const story of stories) {
-    test(story.id, async ({ page }) => {
-      await page.goto(story.url, { waitUntil: 'networkidle' });
-      // Give animations/transitions a beat to settle.
-      await page.waitForTimeout(250);
-      await expect(page).toHaveScreenshot(`${story.id}.png`, {
-        fullPage: false,
-        animations: 'disabled',
-        caret: 'hide',
-        maxDiffPixelRatio: 0.001,
+test.describe
+  .parallel('ladle stories', () => {
+    for (const story of stories) {
+      test(story.id, async ({ page }) => {
+        await page.goto(story.url, { waitUntil: 'networkidle' });
+        // Give animations/transitions a beat to settle.
+        await page.waitForTimeout(250);
+        await expect(page).toHaveScreenshot(`${story.id}.png`, {
+          fullPage: false,
+          animations: 'disabled',
+          caret: 'hide',
+          maxDiffPixelRatio: 0.001,
+        });
       });
-    });
-  }
-});
+    }
+  });
