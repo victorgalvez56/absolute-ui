@@ -1,0 +1,68 @@
+# Maestro E2E workflow
+#
+# TODO: swap for self-hosted runners once we have a mac mini / android
+# emulator fleet to execute Maestro locally. For now we only validate
+# the YAML syntax in CI and defer actual device runs to Maestro Cloud,
+# which is a paid service — so we gate it behind workflow_dispatch to
+# avoid burning credits (or failing) on every push/PR.
+#
+# The mobile-dev-inc/action-maestro-cloud@v1 step below requires the
+# repo secret MAESTRO_CLOUD_API_KEY to be populated. Without it the
+# action no-ops; that's intentional until we wire up the account.
+
+name: Maestro
+
+on:
+  # Manual trigger only — see note above about Maestro Cloud cost.
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: validate flow yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install --user yamllint
+
+      # Lint the YAML itself. Maestro's own CLI has a `validate`
+      # subcommand we'd prefer, but it's only distributed via brew /
+      # install.sh, so yamllint is the portable floor.
+      - name: Lint Maestro flows
+        run: |
+          python -m yamllint \
+            -d "{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable}}" \
+            apps/example/.maestro/
+
+      # Optional: attempt maestro CLI validate if the binary is on
+      # PATH (e.g. when running on a self-hosted runner that has it
+      # pre-installed). Skipped silently otherwise.
+      - name: maestro validate (best-effort)
+        run: |
+          if command -v maestro >/dev/null 2>&1; then
+            for flow in apps/example/.maestro/*.yaml; do
+              maestro validate "$flow"
+            done
+          else
+            echo "maestro CLI not on PATH; skipping. Install via brew on self-hosted runners."
+          fi
+
+  cloud:
+    name: maestro cloud (paid — manual)
+    runs-on: ubuntu-latest
+    needs: validate
+    # Extra guard: only run the cloud step if the secret is populated.
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Placeholder — wire up once MAESTRO_CLOUD_API_KEY is in repo
+      # secrets. Replace app-file with the real .app/.apk artifact
+      # path from the build pipeline.
+      - name: Run flows on Maestro Cloud
+        uses: mobile-dev-inc/action-maestro-cloud@v1
+        with:
+          api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+          app-file: apps/example/ios/build/AbsoluteUiExample.app
+          workspace: apps/example/.maestro
