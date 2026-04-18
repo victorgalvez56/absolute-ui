@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ladle serve --port 61000",
+    "dev": "ladle serve --port 61000 --viteConfig ./.ladle/vite.config.mjs",
     "build": "ladle build --viteConfig ./.ladle/vite.config.mjs",
     "preview": "ladle preview --viteConfig ./.ladle/vite.config.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
