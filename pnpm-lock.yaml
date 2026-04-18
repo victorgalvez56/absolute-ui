@@ -112,6 +112,9 @@ importers:
         specifier: ^0.19.13
         version: 0.19.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
+      '@absolute-ui/mocks':
+        specifier: workspace:*
+        version: link:../../packages/mocks
       '@ladle/react':
         specifier: ^4.1.2
         version: 4.1.2(@types/node@25.6.0)(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(terser@5.46.1)(typescript@5.9.3)
@@ -167,6 +170,12 @@ importers:
       react-native-web:
         specifier: ^0.19.13
         version: 0.19.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
+  packages/mocks:
+    dependencies:
+      msw:
+        specifier: ^2.6.8
+        version: 2.13.3(@types/node@25.6.0)(typescript@5.9.3)
 
   packages/tokens: {}
 

@@ -7,7 +7,8 @@
     "dev": "ladle serve --port 61000",
     "build": "ladle build --viteConfig ./.ladle/vite.config.mjs",
     "preview": "ladle preview --viteConfig ./.ladle/vite.config.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "mocks:init": "pnpm --filter @absolute-ui/mocks exec msw init ../../apps/ladle/public/ --save"
   },
   "dependencies": {
     "@absolute-ui/a11y": "workspace:*",
@@ -18,6 +19,7 @@
     "react-native-web": "^0.19.13"
   },
   "devDependencies": {
+    "@absolute-ui/mocks": "workspace:*",
     "@ladle/react": "^4.1.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1"
