@@ -11,8 +11,11 @@
       "**/dist/**",
       "**/node_modules/**",
       "**/.expo/**",
+      "**/.next/**",
       "**/build/**",
+      "**/out/**",
       "**/.claude/worktrees/**",
+      "apps/docs/next-env.d.ts",
       "apps/example/ios/**",
       "apps/example/android/**",
       "apps/example/__tests__/**"
