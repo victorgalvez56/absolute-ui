@@ -1,0 +1,21 @@
+# Flashlight performance benchmark for Absolute UI's example app.
+#
+# Drives the existing Maestro smoke flow (TabBar traversal) while
+# Flashlight samples FPS, CPU, and memory from adb. The aggregate
+# score (0-100) is the contract enforced by the flashlight.yml
+# workflow — target >= 90 on Pixel 6a, PR-over-PR delta <= 3 points
+# (see IMPLEMENTATION_PLAN.md section 8).
+#
+# Flashlight invokes the testCommand in a subprocess; paths are
+# resolved from this file's directory, so we hop up one level to
+# reach the sibling .maestro/ folder.
+
+appId: com.absoluteuiexample
+testCommand: "maestro test ../.maestro/smoke.yaml"
+
+# Flashlight standard: 10 iterations smooths out cold-start jitter.
+iterationCount: 10
+
+# 10s per iteration is enough to exercise launch + three tab taps
+# without padding the run with idle frames that dilute the score.
+duration: 10000
