@@ -1,0 +1,27 @@
+# Input flow — taps the Email field, types a value, dismisses the
+# keyboard by tapping a stable anchor (the section title), then
+# asserts the helper text still renders and no error has surfaced.
+# The GlassInput exposes its label as the accessibility node, so we
+# can match by "Email".
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Email"
+    direction: DOWN
+
+- tapOn: "Email"
+- inputText: "you@example.com"
+
+# Tap the section header to dismiss the soft keyboard without
+# triggering any other action.
+- tapOn: "Input"
+
+- assertVisible: "you@example.com"
+# Helper text from the showcase confirms no validation error fired.
+- assertVisible: "Dynamic Type scales this all the way up."
+- assertNotVisible: "error"

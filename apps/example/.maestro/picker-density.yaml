@@ -1,0 +1,29 @@
+# Picker flow — taps each density option (Cozy default, then
+# Compact, then Comfortable, then back to Cozy) and asserts each
+# label remains visible after selection. The picker re-renders the
+# selected item with a highlight; assertion-by-text catches both the
+# label and its highlighted twin.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Row density"
+    direction: DOWN
+
+- assertVisible: "Compact"
+- assertVisible: "Cozy"
+- assertVisible: "Comfortable"
+
+- tapOn: "Compact"
+- assertVisible: "Compact"
+
+- tapOn: "Comfortable"
+- assertVisible: "Comfortable"
+
+# Restore the showcase default so the suite stays idempotent.
+- tapOn: "Cozy"
+- assertVisible: "Cozy"
