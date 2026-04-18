@@ -3,14 +3,26 @@
   "version": "0.0.0",
   "description": "Accessibility utilities for Absolute UI — APCA contrast, preference resolvers, focus ring.",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "files": ["src", "README.md"],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run clean && pnpm run build"
   },
+  "sideEffects": false,
   "dependencies": {
     "@absolute-ui/tokens": "workspace:*"
   },
