@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "perf": "reassure",
+    "perf:baseline": "reassure --baseline"
   },
   "dependencies": {
     "@absolute-ui/a11y": "workspace:*",
@@ -27,7 +29,9 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "react": "^18.3.1",
-    "react-native-web": "^0.19.13"
+    "react-native-web": "^0.19.13",
+    "react-test-renderer": "^18.3.1",
+    "reassure": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"
