@@ -1,0 +1,27 @@
+{
+  "name": "@absolute-ui/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Documentation site for the Absolute UI liquid-glass design system.",
+  "scripts": {
+    "dev": "next dev --port 63000",
+    "build": "next build",
+    "start": "next start --port 63000",
+    "lint": "biome check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@absolute-ui/tokens": "workspace:*",
+    "next": "^15.5.15",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.9.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3"
+  }
+}
