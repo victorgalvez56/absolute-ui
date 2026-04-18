@@ -14,7 +14,24 @@ export {
 export type { GlassSurfaceProps } from './components/GlassSurface/index.js';
 
 export { GlassButton } from './components/GlassButton/index.js';
-export type { GlassButtonProps } from './components/GlassButton/index.js';
+export type {
+  GlassButtonProps,
+  GlassButtonTextProps,
+  GlassButtonIconProps,
+  GlassButtonSpinnerProps,
+  GlassButtonAction,
+  GlassButtonVariant,
+  GlassButtonSize,
+} from './components/GlassButton/index.js';
+
+export { Box, HStack, VStack } from './components/layout/index.js';
+export type {
+  BoxProps,
+  HStackProps,
+  VStackProps,
+  BoxLayoutProps,
+  SpacingValue,
+} from './components/layout/index.js';
 
 export { GlassCard } from './components/GlassCard/index.js';
 export type {

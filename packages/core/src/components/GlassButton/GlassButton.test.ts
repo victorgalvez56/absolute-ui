@@ -21,10 +21,13 @@ import {
   FOCUS_RING_OFFSET,
   FOCUS_RING_WIDTH,
   MIN_HIT_TARGET,
+  OUTLINE_BORDER_WIDTH,
   buildGlassButtonPressableStyle,
   buildGlassButtonTextStyle,
   isGlassButtonInteractive,
   resolveGlassButtonAccessibilityLabel,
+  resolveGlassButtonColors,
+  resolveGlassButtonSize,
   shouldWrapChildInText,
 } from './style.js';
 
@@ -164,6 +167,194 @@ describe('isGlassButtonInteractive', () => {
     expect(isGlassButtonInteractive({ disabled: true, hasOnPress: true })).toBe(false);
     expect(isGlassButtonInteractive({ disabled: false, hasOnPress: false })).toBe(false);
     expect(isGlassButtonInteractive({ disabled: true, hasOnPress: false })).toBe(false);
+  });
+
+  test('loading suppresses interaction even with a handler', () => {
+    expect(isGlassButtonInteractive({ disabled: false, hasOnPress: true, loading: true })).toBe(
+      false,
+    );
+    expect(isGlassButtonInteractive({ disabled: false, hasOnPress: true, loading: false })).toBe(
+      true,
+    );
+  });
+});
+
+describe('resolveGlassButtonSize', () => {
+  test('md defaults match the Phase 1 baseline', () => {
+    const md = resolveGlassButtonSize('md');
+    expect(md.paddingHorizontal).toBe(20);
+    expect(md.paddingVertical).toBe(12);
+    expect(md.fontSize).toBe(16);
+  });
+
+  test('sm shrinks padding and font but pressable keeps 44pt floor', () => {
+    const sm = resolveGlassButtonSize('sm');
+    expect(sm.paddingHorizontal).toBeLessThan(20);
+    expect(sm.fontSize).toBeLessThan(16);
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+      size: 'sm',
+    });
+    expect(style.minWidth).toBe(MIN_HIT_TARGET);
+    expect(style.minHeight).toBe(MIN_HIT_TARGET);
+  });
+
+  test('lg grows padding, font, and gap', () => {
+    const md = resolveGlassButtonSize('md');
+    const lg = resolveGlassButtonSize('lg');
+    expect(lg.paddingHorizontal).toBeGreaterThan(md.paddingHorizontal);
+    expect(lg.fontSize).toBeGreaterThan(md.fontSize);
+    expect(lg.gap).toBeGreaterThan(md.gap);
+  });
+
+  test('defaults to md when size omitted', () => {
+    expect(resolveGlassButtonSize()).toEqual(resolveGlassButtonSize('md'));
+  });
+});
+
+describe('resolveGlassButtonColors', () => {
+  const { aurora } = {
+    aurora: {
+      colors: {
+        background: '#000',
+        textPrimary: '#FFF',
+        textSecondary: '#AAA',
+        accent: '#1E9B82',
+        onAccent: '#000',
+        focusRing: '#A6F0E0',
+        divider: '#333',
+        danger: '#FF5A5F',
+      },
+    },
+  };
+
+  test('solid primary uses accent background + onAccent text', () => {
+    const t = resolveGlassButtonColors({
+      action: 'primary',
+      variant: 'solid',
+      colors: aurora.colors,
+    });
+    expect(t.background).toBe('#1E9B82');
+    expect(t.foreground).toBe('#000');
+    expect(t.useGlassSurface).toBe(true);
+    expect(t.border).toBeUndefined();
+    expect(t.underline).toBe(false);
+  });
+
+  test('solid danger uses the danger role', () => {
+    const t = resolveGlassButtonColors({
+      action: 'danger',
+      variant: 'solid',
+      colors: aurora.colors,
+    });
+    expect(t.background).toBe('#FF5A5F');
+    expect(t.foreground).toBe('#000');
+  });
+
+  test('outline paints border in the action color, no background', () => {
+    const t = resolveGlassButtonColors({
+      action: 'primary',
+      variant: 'outline',
+      colors: aurora.colors,
+    });
+    expect(t.background).toBeUndefined();
+    expect(t.border).toBe('#1E9B82');
+    expect(t.foreground).toBe('#1E9B82');
+    expect(t.useGlassSurface).toBe(true);
+  });
+
+  test('ghost drops the glass surface and has no background', () => {
+    const t = resolveGlassButtonColors({
+      action: 'primary',
+      variant: 'ghost',
+      colors: aurora.colors,
+    });
+    expect(t.useGlassSurface).toBe(false);
+    expect(t.background).toBeUndefined();
+    expect(t.border).toBeUndefined();
+    expect(t.foreground).toBe('#1E9B82');
+  });
+
+  test('link drops the glass surface and underlines the text', () => {
+    const t = resolveGlassButtonColors({
+      action: 'primary',
+      variant: 'link',
+      colors: aurora.colors,
+    });
+    expect(t.useGlassSurface).toBe(false);
+    expect(t.underline).toBe(true);
+  });
+
+  test('soft (default) uses body text color on glass', () => {
+    const t = resolveGlassButtonColors({
+      action: 'primary',
+      variant: 'soft',
+      colors: aurora.colors,
+    });
+    expect(t.background).toBeUndefined();
+    expect(t.foreground).toBe('#FFF');
+    expect(t.useGlassSurface).toBe(true);
+  });
+
+  test('neutral action picks textPrimary as the accent color', () => {
+    const outline = resolveGlassButtonColors({
+      action: 'neutral',
+      variant: 'outline',
+      colors: aurora.colors,
+    });
+    expect(outline.foreground).toBe('#FFF');
+    expect(outline.border).toBe('#FFF');
+  });
+});
+
+describe('buildGlassButtonPressableStyle variant wiring', () => {
+  test('backgroundColor lands on the style when passed', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+      backgroundColor: '#1E9B82',
+    });
+    expect(style.backgroundColor).toBe('#1E9B82');
+  });
+
+  test('borderColor adds a hairline border at OUTLINE_BORDER_WIDTH', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+      borderColor: '#1E9B82',
+    });
+    expect(style.borderColor).toBe('#1E9B82');
+    expect(style.borderWidth).toBe(OUTLINE_BORDER_WIDTH);
+  });
+
+  test('row layout + inter-slot gap enable Icon / Text / Spinner composition', () => {
+    const style = buildGlassButtonPressableStyle({
+      pressed: false,
+      disabled: false,
+      focusRingColor: FOCUS,
+      size: 'md',
+    });
+    expect(style.flexDirection).toBe('row');
+    expect(style.gap).toBe(resolveGlassButtonSize('md').gap);
+  });
+});
+
+describe('buildGlassButtonTextStyle size + underline', () => {
+  test('sm text scales down', () => {
+    expect(buildGlassButtonTextStyle('#fff', 'sm').fontSize).toBe(14);
+  });
+
+  test('lg text scales up', () => {
+    expect(buildGlassButtonTextStyle('#fff', 'lg').fontSize).toBe(18);
+  });
+
+  test('underline flag applies textDecorationLine', () => {
+    expect(buildGlassButtonTextStyle('#fff', 'md', true).textDecorationLine).toBe('underline');
+    expect(buildGlassButtonTextStyle('#fff', 'md', false).textDecorationLine).toBe('none');
   });
 });
 
