@@ -1,0 +1,29 @@
+# Buttons flow — exercises the three GlassButton variants in the
+# Buttons section: Primary (active), Disabled (no-op), Elevation 2
+# (elevated). We tap each one and re-assert it stays on screen, since
+# none of them mutate UI state visible from the showcase.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- assertVisible: "Primary"
+- assertVisible: "Disabled"
+- assertVisible: "Elevated"
+
+- tapOn:
+    text: "Primary action"
+- assertVisible: "Primary"
+
+# Disabled button must remain visible and not navigate or open
+# anything — we re-assert the title to prove no overlay popped.
+- tapOn:
+    text: "Disabled"
+- assertVisible: "Absolute UI"
+- assertVisible: "Disabled"
+
+- tapOn:
+    text: "Elevation 2"
+- assertVisible: "Elevated"
+- assertVisible: "Absolute UI"

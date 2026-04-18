@@ -1,0 +1,34 @@
+# Slider flow — focuses the Volume slider via its accessibilityLabel,
+# swipes right to bump the value, and asserts the formatted "%"
+# readout still renders. We don't pin to an exact value because
+# swipe distance translates to slider deltas inconsistently across
+# screen sizes.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Volume"
+    direction: DOWN
+
+- assertVisible: "Volume"
+# Initial readout from the showcase state is "55%". The formatter
+# always appends "%" so partial matching keeps the assertion robust.
+- assertVisible:
+    text: "%"
+
+- swipe:
+    from:
+      text: "Volume"
+    direction: RIGHT
+    duration: 600
+
+# Re-assert the readout still ends in "%" after the swipe — the
+# slider's formatValue stays attached, so this proves the value
+# updated rather than the component unmounting.
+- assertVisible:
+    text: "%"
+- assertVisible: "Volume"

@@ -1,0 +1,23 @@
+# Toast flow — taps "Show toast" and asserts "Saved" appears, then
+# waits ~3s (showcase auto-dismisses at 2.4s) and asserts the toast
+# disappeared. We end in the same state we started.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+- scrollUntilVisible:
+    element:
+      text: "Show toast"
+    direction: DOWN
+
+- tapOn: "Show toast"
+- assertVisible: "Saved"
+
+# Showcase fires setTimeout(..., 2400). Wait a touch longer to give
+# the dismiss animation room.
+- waitForAnimationToEnd:
+    timeout: 4000
+- assertNotVisible: "Saved"
+- assertVisible: "Absolute UI"

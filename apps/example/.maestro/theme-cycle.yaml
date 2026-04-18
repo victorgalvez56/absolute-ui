@@ -1,0 +1,25 @@
+# Theme cycle flow — taps the trailing NavBar button four times so the
+# theme rotates aurora -> obsidian -> frost -> sunset -> aurora, and
+# asserts each label appears in turn. Restores the starting theme.
+appId: org.reactjs.native.example.AbsoluteUiExample
+---
+- launchApp:
+    clearState: false
+- assertVisible: "Absolute UI"
+
+# Initial theme: aurora. The Pressable's accessibilityLabel includes
+# the current label, so matching by "Aurora" is enough.
+- assertVisible: "Aurora"
+
+- tapOn: "Aurora"
+- assertVisible: "Obsidian"
+
+- tapOn: "Obsidian"
+- assertVisible: "Frost"
+
+- tapOn: "Frost"
+- assertVisible: "Sunset"
+
+# Fourth tap returns to aurora — the suite ends in the same state.
+- tapOn: "Sunset"
+- assertVisible: "Aurora"
