@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "ladle serve --port 61000",
-    "build": "ladle build",
+    "build": "ladle build --viteConfig ./.ladle/vite.config.mjs",
+    "preview": "ladle preview --viteConfig ./.ladle/vite.config.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

@@ -10,11 +10,28 @@
  *
  * `__DEV__` is stamped because RN's runtime assumes the global exists.
  */
+import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
+
+// Resolve react-native-web to its absolute package path so both the
+// dev server AND the Rollup production build can find it from every
+// file in the monorepo. With pnpm workspaces, `react-native-web`
+// lives at apps/ladle/node_modules — a bare-name replacement relies
+// on Rollup walking up from each importer's directory, which works
+// for dev but silently drops out during production builds. Pinning
+// the replacement to the absolute package root sidesteps that.
+const require = createRequire(import.meta.url);
+const reactNativeWebEntry = require.resolve('react-native-web');
+const reactNativeWebRoot = dirname(require.resolve('react-native-web/package.json'));
+
 export default {
   resolve: {
-    alias: {
-      'react-native': 'react-native-web',
-    },
+    alias: [
+      // Exact-match entry import: import {...} from 'react-native'
+      { find: /^react-native$/, replacement: reactNativeWebEntry },
+      // Sub-path imports: import x from 'react-native/Libraries/…'
+      { find: /^react-native\//, replacement: `${reactNativeWebRoot}/` },
+    ],
     extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.tsx', '.ts', '.jsx', '.js'],
   },
   optimizeDeps: {
