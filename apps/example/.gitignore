@@ -73,3 +73,9 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Flashlight — ignore all run artifacts except the baseline, which
+# is the regression contract and MUST be tracked.
+.flashlight/results/*
+!.flashlight/results/.gitkeep
+!.flashlight/results/*baseline*.json

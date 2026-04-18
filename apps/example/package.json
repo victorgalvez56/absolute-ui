@@ -8,7 +8,9 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "pods": "bundle exec pod install --project-directory=ios",
-    "test": "jest"
+    "test": "jest",
+    "perf:flashlight": "flashlight test --config .flashlight/showcase.yaml",
+    "perf:flashlight:baseline": "flashlight measure --bundleId com.absoluteuiexample"
   },
   "dependencies": {
     "@absolute-ui/a11y": "workspace:*",
