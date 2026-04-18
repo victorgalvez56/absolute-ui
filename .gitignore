@@ -23,3 +23,10 @@ web-build/
 
 # OS
 Thumbs.db
+
+# Visual regression (Playwright) — ignore run artefacts but KEEP baselines.
+# Baselines live under `apps/visual/tests/**/*-snapshots/` and are committed.
+apps/visual/test-results/
+apps/visual/playwright-report/
+!apps/visual/tests/**/*-snapshots/
+!apps/visual/tests/**/*-snapshots/**
