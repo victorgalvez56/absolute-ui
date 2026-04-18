@@ -201,8 +201,9 @@ const GlassButtonRoot = forwardRef<unknown, GlassButtonProps>(function GlassButt
     return style !== undefined ? <View style={style}>{pressable}</View> : pressable;
   }
 
+  const styleProps = style !== undefined ? { style } : {};
   return (
-    <GlassSurface elevation={elevation} radius={radius} style={style} accessibilityRole="none">
+    <GlassSurface elevation={elevation} radius={radius} accessibilityRole="none" {...styleProps}>
       {pressable}
     </GlassSurface>
   );

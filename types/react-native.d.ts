@@ -61,25 +61,29 @@ declare module 'react-native' {
     stopPropagation: () => void;
   };
 
+  // Props are typed with `T | undefined` (not just optional) so callers
+  // under `exactOptionalPropertyTypes: true` can pass the result of a
+  // `resolveX()` helper that returns `string | undefined` straight into
+  // the prop without threading conditional-spread boilerplate.
   export type ViewProps = {
-    style?: ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>;
-    children?: ReactNode;
-    accessibilityRole?: AccessibilityRole;
-    accessibilityLabel?: string;
-    accessibilityHint?: string;
-    accessibilityState?: AccessibilityState;
-    accessibilityValue?: AccessibilityValue;
-    accessible?: boolean;
-    testID?: string;
-    pointerEvents?: 'auto' | 'none' | 'box-none' | 'box-only';
-    onLayout?: (event: LayoutChangeEvent) => void;
-    onKeyDown?: (event: KeyboardEventLike) => void;
-    ref?: Ref<unknown>;
+    style?: ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined> | undefined;
+    children?: ReactNode | undefined;
+    accessibilityRole?: AccessibilityRole | undefined;
+    accessibilityLabel?: string | undefined;
+    accessibilityHint?: string | undefined;
+    accessibilityState?: AccessibilityState | undefined;
+    accessibilityValue?: AccessibilityValue | undefined;
+    accessible?: boolean | undefined;
+    testID?: string | undefined;
+    pointerEvents?: 'auto' | 'none' | 'box-none' | 'box-only' | undefined;
+    onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
+    onKeyDown?: ((event: KeyboardEventLike) => void) | undefined;
+    ref?: Ref<unknown> | undefined;
   };
 
   export type TextProps = ViewProps & {
-    numberOfLines?: number;
-    allowFontScaling?: boolean;
+    numberOfLines?: number | undefined;
+    allowFontScaling?: boolean | undefined;
   };
 
   export type PressableStateCallbackType = {
@@ -89,27 +93,31 @@ declare module 'react-native' {
   };
 
   export type PressableProps = Omit<ViewProps, 'style' | 'children'> & {
-    onPress?: () => void;
-    onPressIn?: () => void;
-    onPressOut?: () => void;
-    onLongPress?: () => void;
-    disabled?: boolean;
-    hitSlop?: number | { top?: number; bottom?: number; left?: number; right?: number };
+    onPress?: (() => void) | undefined;
+    onPressIn?: (() => void) | undefined;
+    onPressOut?: (() => void) | undefined;
+    onLongPress?: (() => void) | undefined;
+    disabled?: boolean | undefined;
+    hitSlop?:
+      | number
+      | { top?: number; bottom?: number; left?: number; right?: number }
+      | undefined;
     style?:
       | ViewStyle
       | ReadonlyArray<ViewStyle | false | null | undefined>
       | ((
           state: PressableStateCallbackType,
-        ) => ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>);
-    children?: ReactNode | ((state: PressableStateCallbackType) => ReactNode);
+        ) => ViewStyle | ReadonlyArray<ViewStyle | false | null | undefined>)
+      | undefined;
+    children?: ReactNode | ((state: PressableStateCallbackType) => ReactNode) | undefined;
   };
 
   export type ScrollViewProps = ViewProps & {
-    contentContainerStyle?: ViewStyle;
-    horizontal?: boolean;
-    showsHorizontalScrollIndicator?: boolean;
-    showsVerticalScrollIndicator?: boolean;
-    bounces?: boolean;
+    contentContainerStyle?: ViewStyle | undefined;
+    horizontal?: boolean | undefined;
+    showsHorizontalScrollIndicator?: boolean | undefined;
+    showsVerticalScrollIndicator?: boolean | undefined;
+    bounces?: boolean | undefined;
   };
 
   export type KeyboardType =
@@ -123,27 +131,27 @@ declare module 'react-native' {
     | 'visible-password';
 
   export type TextInputProps = Omit<ViewProps, 'style' | 'children'> & {
-    value?: string;
-    defaultValue?: string;
-    placeholder?: string;
-    placeholderTextColor?: string;
-    editable?: boolean;
-    secureTextEntry?: boolean;
-    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-    autoCorrect?: boolean;
-    autoFocus?: boolean;
-    keyboardType?: KeyboardType;
-    maxLength?: number;
-    multiline?: boolean;
-    numberOfLines?: number;
-    returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
-    onChangeText?: (text: string) => void;
-    onFocus?: () => void;
-    onBlur?: () => void;
-    onSubmitEditing?: () => void;
-    style?: TextStyle | ReadonlyArray<TextStyle | false | null | undefined>;
-    allowFontScaling?: boolean;
-    'aria-invalid'?: boolean;
+    value?: string | undefined;
+    defaultValue?: string | undefined;
+    placeholder?: string | undefined;
+    placeholderTextColor?: string | undefined;
+    editable?: boolean | undefined;
+    secureTextEntry?: boolean | undefined;
+    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
+    autoCorrect?: boolean | undefined;
+    autoFocus?: boolean | undefined;
+    keyboardType?: KeyboardType | undefined;
+    maxLength?: number | undefined;
+    multiline?: boolean | undefined;
+    numberOfLines?: number | undefined;
+    returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send' | undefined;
+    onChangeText?: ((text: string) => void) | undefined;
+    onFocus?: (() => void) | undefined;
+    onBlur?: (() => void) | undefined;
+    onSubmitEditing?: (() => void) | undefined;
+    style?: TextStyle | ReadonlyArray<TextStyle | false | null | undefined> | undefined;
+    allowFontScaling?: boolean | undefined;
+    'aria-invalid'?: boolean | undefined;
   };
 
   export const View: ComponentType<ViewProps>;
