@@ -1,5 +1,6 @@
 const path = require('node:path');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const withStorybook = require('@storybook/react-native/metro/withStorybook');
 
 /**
  * Monorepo-aware Metro configuration.
@@ -35,4 +36,15 @@ const config = {
   },
 };
 
-module.exports = mergeConfig(getDefaultConfig(projectRoot), config);
+/**
+ * Storybook on-device uses `require.context` inside
+ * `.storybook/storybook.requires.ts` to discover story files. Metro
+ * doesn't support that out of the box — the wrapper below teaches
+ * it by adding a custom resolver. The wrapper is a no-op when
+ * STORYBOOK isn't set in the env, so the normal app build stays
+ * lean and unaffected.
+ */
+module.exports = withStorybook(mergeConfig(getDefaultConfig(projectRoot), config), {
+  enabled: process.env.STORYBOOK === '1',
+  configPath: path.resolve(projectRoot, '.storybook'),
+});
