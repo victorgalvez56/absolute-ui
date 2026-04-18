@@ -12,6 +12,7 @@
       "**/node_modules/**",
       "**/.expo/**",
       "**/build/**",
+      "**/.claude/worktrees/**",
       "apps/example/ios/**",
       "apps/example/android/**",
       "apps/example/__tests__/**"
