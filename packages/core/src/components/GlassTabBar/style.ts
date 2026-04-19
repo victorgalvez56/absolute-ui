@@ -21,20 +21,20 @@ export type TabItemStyle = {
   alignItems: 'center';
   justifyContent: 'center';
   paddingVertical: number;
-  /**
-   * A bottom border rendered on the active tab as a structural
-   * state indicator. Width of 0 collapses to nothing on inactive
-   * tabs, width > 0 paints the border with the theme accent color
-   * on the active tab. Not color-only: it's a shape change.
-   */
-  borderBottomWidth: number;
-  borderBottomColor: string;
-  /**
-   * Transparent bottom border of the inactive width keeps the
-   * layout identical whether or not the underline is visible,
-   * so switching tabs doesn't shift content by 2pt.
-   */
-  borderStyle: 'solid';
+};
+
+/**
+ * The sliding indicator is an absolutely-positioned bar rendered
+ * inside the container. Its translateX + width are animated by the
+ * GlassTabBar component; only the static visual properties live here.
+ */
+export type TabIndicatorBaseStyle = {
+  position: 'absolute';
+  bottom: number;
+  left: number;
+  height: number;
+  borderRadius: number;
+  backgroundColor: string;
 };
 
 export type TabLabelStyle = {
@@ -49,8 +49,8 @@ export const TAB_BAR_HORIZONTAL_PADDING = 12;
 export const TAB_BAR_VERTICAL_PADDING = 8;
 export const TAB_BAR_GAP = 4;
 export const TAB_ITEM_MIN_HIT = 44;
-/** Underline stroke width for the active-tab structural indicator. */
-export const TAB_ACTIVE_UNDERLINE_WIDTH = 2;
+/** Stroke height of the animated sliding indicator. */
+export const TAB_INDICATOR_HEIGHT = 2;
 
 export function buildTabBarContainerStyle(): TabBarContainerStyle {
   return {
@@ -64,25 +64,37 @@ export function buildTabBarContainerStyle(): TabBarContainerStyle {
 }
 
 /**
- * Build the item style. Active vs inactive is communicated via an
- * underline stroke (structural, not color) and the label weight
- * (handled by buildTabLabelStyle). No opacity delta — dimming
- * `textSecondary` at 0.55 pushed inactive tab APCA below the Lc 60
- * floor on every theme.
+ * Build the item style. Active vs inactive is communicated via the
+ * animated sliding indicator (structural, not color) and the label
+ * weight (handled by buildTabLabelStyle).
+ * No opacity delta — dimming textSecondary pushed inactive tab APCA
+ * below the Lc 60 floor on every theme.
+ * The `active` param is kept so callers don't need to change their
+ * call-sites; it is unused here because the indicator handles state.
  */
-export function buildTabItemStyle(options: {
-  active: boolean;
-  accentColor: string;
-}): TabItemStyle {
+export function buildTabItemStyle(_options: { active: boolean }): TabItemStyle {
   return {
     flex: 1,
     minHeight: TAB_ITEM_MIN_HIT,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 6,
-    borderStyle: 'solid',
-    borderBottomWidth: TAB_ACTIVE_UNDERLINE_WIDTH,
-    borderBottomColor: options.active ? options.accentColor : 'transparent',
+  };
+}
+
+/**
+ * Static visual properties for the animated sliding indicator.
+ * GlassTabBar drives `width` and `transform: [{translateX}]`
+ * on top of this base via useAnimatedStyle.
+ */
+export function buildTabIndicatorBaseStyle(accentColor: string): TabIndicatorBaseStyle {
+  return {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    height: TAB_INDICATOR_HEIGHT,
+    borderRadius: TAB_INDICATOR_HEIGHT / 2,
+    backgroundColor: accentColor,
   };
 }
 
