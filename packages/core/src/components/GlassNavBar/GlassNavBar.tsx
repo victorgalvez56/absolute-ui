@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect, useRef } from 'react';
 import { Text, View, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { spring } from '@absolute-ui/tokens';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
 import { toSpringConfig, instantTiming } from '../../motion/presets.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
 import {
@@ -67,7 +68,7 @@ export const GlassNavBar = forwardRef<unknown, GlassNavBarProps>(function GlassN
   const styleProps = style !== undefined ? { style } : {};
 
   return (
-    <Animated.View style={mountStyle}>
+    <AnimatedView style={mountStyle}>
       <GlassSurface elevation={elevation} radius={radius} {...styleProps} accessibilityRole="none">
         <View style={containerStyle}>
           <View style={leadingStyle}>{leading ?? null}</View>
@@ -77,6 +78,6 @@ export const GlassNavBar = forwardRef<unknown, GlassNavBarProps>(function GlassN
           <View style={trailingStyle}>{trailing ?? null}</View>
         </View>
       </GlassSurface>
-    </Animated.View>
+    </AnimatedView>
   );
 });

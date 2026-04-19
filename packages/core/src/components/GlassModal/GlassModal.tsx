@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
 import { useEnterExit } from '../../motion/index.js';
 import { GlassSurface } from '../GlassSurface/index.js';
 import {
@@ -62,17 +62,17 @@ export const GlassModal = forwardRef<unknown, GlassModalProps>(function GlassMod
   return (
     <View style={overlayStyle}>
       {/* Backdrop fades in/out independently — no scale transform on the scrim. */}
-      <Animated.View style={[backdropStyle, backdropAnimStyle]}>
+      <AnimatedView style={[backdropStyle, backdropAnimStyle]}>
         <Pressable
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
           onPress={onDismiss}
           accessibilityRole="button"
           accessibilityLabel="Dismiss dialog"
         />
-      </Animated.View>
+      </AnimatedView>
 
       {/* Content surface scales + fades. */}
-      <Animated.View style={contentStyle} accessibilityRole="none" {...wrapperLabelProps}>
+      <AnimatedView style={contentStyle} accessibilityRole="none" {...wrapperLabelProps}>
         <GlassSurface elevation={3} radius="xl" style={surfaceStyle}>
           {title !== undefined ? (
             <Text style={titleStyle} accessibilityRole="header">
@@ -82,7 +82,7 @@ export const GlassModal = forwardRef<unknown, GlassModalProps>(function GlassMod
           {description !== undefined ? <Text style={descriptionStyle}>{description}</Text> : null}
           {children !== undefined ? <View style={{ gap: 12 }}>{children}</View> : null}
         </GlassSurface>
-      </Animated.View>
+      </AnimatedView>
     </View>
   );
 });

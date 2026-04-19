@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { spring } from '@absolute-ui/tokens';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
 import { toSpringConfig, instantTiming } from '../../motion/presets.js';
 import { usePressScale } from '../../motion/index.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
@@ -55,7 +56,7 @@ type TabItemProps = {
 /**
  * Each tab item owns its own usePressScale hook so the hook rules
  * (no conditional calls) are respected. The press animation is
- * applied to an Animated.View wrapping the Pressable.
+ * applied to an AnimatedView wrapping the Pressable.
  */
 function TabItem({ item, active, textColor, onPress }: TabItemProps) {
   const { onPressIn, onPressOut, pressStyle } = usePressScale();
@@ -64,7 +65,7 @@ function TabItem({ item, active, textColor, onPress }: TabItemProps) {
   const label = item.accessibilityLabel ?? `${item.label}, tab`;
 
   return (
-    <Animated.View style={[itemStyle, pressStyle]}>
+    <AnimatedView style={[itemStyle, pressStyle]}>
       <Pressable
         onPress={() => onPress(item.key)}
         onPressIn={onPressIn}
@@ -77,7 +78,7 @@ function TabItem({ item, active, textColor, onPress }: TabItemProps) {
         {item.leading ?? null}
         <Text style={labelStyle}>{item.label}</Text>
       </Pressable>
-    </Animated.View>
+    </AnimatedView>
   );
 }
 
@@ -173,7 +174,7 @@ export const GlassTabBar = forwardRef<unknown, GlassTabBarProps>(function GlassT
           );
         })}
         {/* Sliding indicator overlaid at the bottom of the row. */}
-        <Animated.View style={[indicatorBaseStyle, indicatorStyle]} pointerEvents="none" />
+        <AnimatedView style={[indicatorBaseStyle, indicatorStyle]} pointerEvents="none" />
       </View>
     </GlassSurface>
   );

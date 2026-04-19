@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Text, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
 import { useEnterExit } from '../../motion/index.js';
 import { GlassSurface } from '../GlassSurface/index.js';
 import {
@@ -65,7 +65,7 @@ export const GlassToast = forwardRef<unknown, GlassToastProps>(function GlassToa
 
   return (
     <View style={containerStyle} pointerEvents="box-none">
-      <Animated.View style={contentStyle}>
+      <AnimatedView style={contentStyle}>
         <GlassSurface
           elevation={2}
           radius="pill"
@@ -76,7 +76,7 @@ export const GlassToast = forwardRef<unknown, GlassToastProps>(function GlassToa
           <View style={stripeStyle} />
           <Text style={messageStyle}>{message}</Text>
         </GlassSurface>
-      </Animated.View>
+      </AnimatedView>
     </View>
   );
 });
