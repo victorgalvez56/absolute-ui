@@ -7,13 +7,14 @@
  */
 import { describe, expect, test } from 'vitest';
 import {
-  TAB_ACTIVE_UNDERLINE_WIDTH,
   TAB_BAR_GAP,
   TAB_BAR_HORIZONTAL_PADDING,
   TAB_BAR_MIN_HEIGHT,
   TAB_BAR_VERTICAL_PADDING,
+  TAB_INDICATOR_HEIGHT,
   TAB_ITEM_MIN_HIT,
   buildTabBarContainerStyle,
+  buildTabIndicatorBaseStyle,
   buildTabItemStyle,
   buildTabLabelStyle,
 } from './style.js';
@@ -43,7 +44,7 @@ describe('buildTabBarContainerStyle', () => {
 
 describe('buildTabItemStyle', () => {
   test('every tab is an equal-flex, centered, 44pt-tall hit target', () => {
-    const style = buildTabItemStyle({ active: false, accentColor: ACCENT });
+    const style = buildTabItemStyle({ active: false });
     expect(style.flex).toBe(1);
     expect(style.minHeight).toBe(TAB_ITEM_MIN_HIT);
     expect(TAB_ITEM_MIN_HIT).toBe(44);
@@ -54,29 +55,49 @@ describe('buildTabItemStyle', () => {
     expect((style as Record<string, unknown>).height).toBeUndefined();
   });
 
-  test('active tab renders a structural underline in the accent color', () => {
-    const style = buildTabItemStyle({ active: true, accentColor: ACCENT });
-    expect(style.borderBottomWidth).toBe(TAB_ACTIVE_UNDERLINE_WIDTH);
-    expect(TAB_ACTIVE_UNDERLINE_WIDTH).toBe(2);
-    expect(style.borderBottomColor).toBe(ACCENT);
-    expect(style.borderStyle).toBe('solid');
-  });
-
-  test('inactive tab keeps the border at the same width but transparent', () => {
-    // Transparent border keeps the layout stable across state changes —
-    // switching tabs must not reflow content by 2pt.
-    const style = buildTabItemStyle({ active: false, accentColor: ACCENT });
-    expect(style.borderBottomWidth).toBe(TAB_ACTIVE_UNDERLINE_WIDTH);
-    expect(style.borderBottomColor).toBe('transparent');
+  test('item style does not include border properties (indicator is now a separate Animated.View)', () => {
+    const active = buildTabItemStyle({ active: true });
+    const inactive = buildTabItemStyle({ active: false });
+    expect((active as Record<string, unknown>).borderBottomWidth).toBeUndefined();
+    expect((active as Record<string, unknown>).borderBottomColor).toBeUndefined();
+    expect((inactive as Record<string, unknown>).borderBottomWidth).toBeUndefined();
+    expect((inactive as Record<string, unknown>).borderBottomColor).toBeUndefined();
   });
 
   test('item style no longer applies opacity', () => {
     // Opacity delta dimmed textSecondary past APCA Lc 60 on every theme.
     // The structural underline + fontWeight carry the state cue instead.
-    const active = buildTabItemStyle({ active: true, accentColor: ACCENT });
-    const inactive = buildTabItemStyle({ active: false, accentColor: ACCENT });
+    const active = buildTabItemStyle({ active: true });
+    const inactive = buildTabItemStyle({ active: false });
     expect((active as Record<string, unknown>).opacity).toBeUndefined();
     expect((inactive as Record<string, unknown>).opacity).toBeUndefined();
+  });
+});
+
+describe('buildTabIndicatorBaseStyle', () => {
+  test('is absolutely positioned at the bottom-left of the container', () => {
+    const style = buildTabIndicatorBaseStyle(ACCENT);
+    expect(style.position).toBe('absolute');
+    expect(style.bottom).toBe(0);
+    expect(style.left).toBe(0);
+  });
+
+  test('uses TAB_INDICATOR_HEIGHT stroke (2px) with a rounded cap', () => {
+    const style = buildTabIndicatorBaseStyle(ACCENT);
+    expect(style.height).toBe(TAB_INDICATOR_HEIGHT);
+    expect(TAB_INDICATOR_HEIGHT).toBe(2);
+    expect(style.borderRadius).toBe(TAB_INDICATOR_HEIGHT / 2);
+  });
+
+  test('paints the indicator in the theme accent color', () => {
+    const style = buildTabIndicatorBaseStyle(ACCENT);
+    expect(style.backgroundColor).toBe(ACCENT);
+  });
+
+  test('width and translateX are NOT in the base style — driven by useAnimatedStyle', () => {
+    const style = buildTabIndicatorBaseStyle(ACCENT);
+    expect((style as Record<string, unknown>).width).toBeUndefined();
+    expect((style as Record<string, unknown>).transform).toBeUndefined();
   });
 });
 
