@@ -124,6 +124,54 @@ export const States = () => {
   );
 };
 
+export const ReducedMotion = () => {
+  // Left: selected indicator slides between segments (standard spring).
+  // Right: reducedMotion=true, so the indicator jumps to the new segment
+  // with no animation. Tapping between options on each side shows the
+  // same selection outcome with different motion characteristics.
+  const [left, setLeft] = useState<RangeValue>('week');
+  const [right, setRight] = useState<RangeValue>('week');
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, padding: 24 }}>
+      <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Default motion
+          </div>
+          <GlassPicker label="Range" items={rangeItems} value={left} onValueChange={setLeft} />
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+      <AbsoluteUIContext.Provider
+        value={{
+          theme: themes.aurora,
+          preferences: { ...defaultPreferences, reducedMotion: true },
+        }}
+      >
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Reduced Motion · indicator jumps instantly
+          </div>
+          <GlassPicker label="Range" items={rangeItems} value={right} onValueChange={setRight} />
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+    </div>
+  );
+};
+
 export const Keyboard = () => {
   const [range, setRange] = useState<RangeValue>('day');
   return (

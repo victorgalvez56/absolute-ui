@@ -111,6 +111,56 @@ export const States = () => (
   </AbsoluteUIContext.Provider>
 );
 
+export const ReducedMotion = () => (
+  // Left: surface springs to a 0.6% lift on focus (gentle spring).
+  // Right: reducedMotion=true swaps the spring for zero-duration timing,
+  // so the focus lift applies instantly. Tab between fields in each
+  // column to feel the difference.
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, padding: 24 }}>
+    <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
+      <Backdrop theme={themes.aurora}>
+        <div
+          style={{
+            color: themes.aurora.colors.textPrimary,
+            fontSize: 14,
+            fontWeight: 600,
+            marginBottom: 16,
+          }}
+        >
+          Default motion
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 360 }}>
+          <GlassInput label="Email" placeholder="you@example.com" />
+          <GlassInput label="Password" placeholder="••••••••" secureTextEntry />
+        </div>
+      </Backdrop>
+    </AbsoluteUIContext.Provider>
+    <AbsoluteUIContext.Provider
+      value={{
+        theme: themes.aurora,
+        preferences: { ...defaultPreferences, reducedMotion: true },
+      }}
+    >
+      <Backdrop theme={themes.aurora}>
+        <div
+          style={{
+            color: themes.aurora.colors.textPrimary,
+            fontSize: 14,
+            fontWeight: 600,
+            marginBottom: 16,
+          }}
+        >
+          Reduced Motion · focus lift applies instantly
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 360 }}>
+          <GlassInput label="Email" placeholder="you@example.com" />
+          <GlassInput label="Password" placeholder="••••••••" secureTextEntry />
+        </div>
+      </Backdrop>
+    </AbsoluteUIContext.Provider>
+  </div>
+);
+
 export const ReducedTransparency = () => (
   <AbsoluteUIContext.Provider
     value={{
