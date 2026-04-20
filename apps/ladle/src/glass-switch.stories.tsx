@@ -83,6 +83,62 @@ export const States = () => (
   </AbsoluteUIContext.Provider>
 );
 
+export const ReducedMotion = () => {
+  // Side-by-side demo: left column springs the thumb between off/on
+  // (standard snappy spring); right column uses reducedMotion=true so
+  // the thumb snaps immediately. Flip a few switches on each side to
+  // feel the difference — both columns remain fully functional.
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, padding: 24 }}>
+      <AbsoluteUIContext.Provider
+        value={{ theme: themes.aurora, preferences: defaultPreferences }}
+      >
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Default motion
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320 }}>
+            <GlassSwitch label="Wi-Fi" defaultValue={true} onValueChange={() => {}} />
+            <GlassSwitch label="Bluetooth" defaultValue={false} onValueChange={() => {}} />
+            <GlassSwitch label="Airplane mode" defaultValue={false} onValueChange={() => {}} />
+          </div>
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+      <AbsoluteUIContext.Provider
+        value={{
+          theme: themes.aurora,
+          preferences: { ...defaultPreferences, reducedMotion: true },
+        }}
+      >
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Reduced Motion · thumb snaps instantly
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320 }}>
+            <GlassSwitch label="Wi-Fi" defaultValue={true} onValueChange={() => {}} />
+            <GlassSwitch label="Bluetooth" defaultValue={false} onValueChange={() => {}} />
+            <GlassSwitch label="Airplane mode" defaultValue={false} onValueChange={() => {}} />
+          </div>
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+    </div>
+  );
+};
+
 export const SettingsRow = () => {
   const [wifi, setWifi] = useState(true);
   const [bluetooth, setBluetooth] = useState(false);
