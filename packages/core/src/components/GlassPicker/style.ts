@@ -58,6 +58,16 @@ export type GlassPickerLabelStyle = {
   marginBottom: number;
 };
 
+export type GlassPickerIndicatorStyle = {
+  position: 'absolute';
+  top: number;
+  bottom: number;
+  left: number;
+  width: number;
+  borderRadius: number;
+  backgroundColor: string;
+};
+
 /**
  * Locate the selected item's index. Returns -1 when no item matches
  * so the caller can distinguish "nothing selected" from "first item
@@ -184,6 +194,27 @@ export function buildGlassPickerLabelStyle(textPrimary: string): GlassPickerLabe
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 6,
+  };
+}
+
+/**
+ * Base style for the sliding accent indicator. The motion layer then
+ * overlays an animated style that drives `left` and `width` as the
+ * selected segment changes. The indicator is inset 4dp vertically so
+ * it sits flush inside the container's padding and matches the
+ * segment's `borderRadius: 8` visual pill.
+ */
+export function buildGlassPickerIndicatorStyle(options: {
+  accentColor: string;
+}): GlassPickerIndicatorStyle {
+  return {
+    position: 'absolute',
+    top: 4,
+    bottom: 4,
+    left: 0,
+    width: 0,
+    borderRadius: 8,
+    backgroundColor: options.accentColor,
   };
 }
 
