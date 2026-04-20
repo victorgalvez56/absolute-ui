@@ -1,6 +1,8 @@
 import { forwardRef } from 'react';
 import { Text, View } from 'react-native';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
+import { useEnterExit } from '../../motion/index.js';
 import { GlassSurface } from '../GlassSurface/index.js';
 import {
   type ToastPosition,
@@ -28,26 +30,31 @@ export type GlassToastProps = {
   accessibilityLabel?: string;
 };
 
+/** Slide offset used for the enter/exit translation. */
+const SLIDE_OFFSET = 24;
+
 /**
- * Ephemeral notification toast. Floats over content at the top or
- * bottom of the viewport without a scrim — consumers are expected
- * to drive `visible` via a timer or a result of an async action.
+ * Ephemeral notification toast with a slide+fade enter/exit animation.
  *
- * The variant drives a small leading stripe (success / error /
- * info / default-accent). The stripe is a structural indicator;
- * assistive tech gets the full message via the Text child, not
- * via the color, so the component is not color-only.
- *
- * `accessibilityLiveRegion="polite"` would be ideal for native
- * RN but is not part of the type shim yet — track for a later
- * shim extension.
+ * Bottom toast: slides up from below (+24 → 0).
+ * Top toast:    slides down from above (−24 → 0).
+ * Reduced Motion: instant opacity swap, no translate.
  */
 export const GlassToast = forwardRef<unknown, GlassToastProps>(function GlassToast(
   { visible, message, variant = 'default', position = 'bottom', accessibilityLabel },
   _ref,
 ) {
   const { theme } = useAbsoluteUI();
-  if (!visible) return null;
+
+  // Direction: bottom toast slides up (positive Y → 0), top slides down.
+  const fromTranslateY = position === 'bottom' ? SLIDE_OFFSET : -SLIDE_OFFSET;
+
+  const { rendered, contentStyle } = useEnterExit(visible, {
+    springToken: 'standard',
+    fromTranslateY,
+  });
+
+  if (!rendered) return null;
 
   const containerStyle = buildToastContainerStyle(position);
   const pillStyle = buildToastPillStyle();
@@ -58,16 +65,18 @@ export const GlassToast = forwardRef<unknown, GlassToastProps>(function GlassToa
 
   return (
     <View style={containerStyle} pointerEvents="box-none">
-      <GlassSurface
-        elevation={2}
-        radius="pill"
-        style={pillStyle}
-        accessibilityRole="none"
-        accessibilityLabel={label}
-      >
-        <View style={stripeStyle} />
-        <Text style={messageStyle}>{message}</Text>
-      </GlassSurface>
+      <AnimatedView style={contentStyle}>
+        <GlassSurface
+          elevation={2}
+          radius="pill"
+          style={pillStyle}
+          accessibilityRole="none"
+          accessibilityLabel={label}
+        >
+          <View style={stripeStyle} />
+          <Text style={messageStyle}>{message}</Text>
+        </GlassSurface>
+      </AnimatedView>
     </View>
   );
 });

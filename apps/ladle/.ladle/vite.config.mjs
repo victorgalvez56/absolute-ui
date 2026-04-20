@@ -8,10 +8,19 @@
  * package (which ships Flow syntax) before the alias is applied.
  * `react-native-web` is explicitly included so it's still pre-bundled.
  *
+ * `react-native-reanimated` is aliased to a local stub. Reanimated
+ * requires a Babel/Metro worklet plugin that is unavailable in Vite.
+ * The stub provides instant-transition equivalents of every Reanimated
+ * API used by the motion layer so stories always show the correct final
+ * visual state without needing the native worklet runtime.
+ *
  * `__DEV__` is stamped because RN's runtime assumes the global exists.
  */
 import { createRequire } from 'node:module';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Resolve react-native-web to its absolute package path so both the
 // dev server AND the Rollup production build can find it from every
@@ -21,8 +30,15 @@ import { dirname } from 'node:path';
 // for dev but silently drops out during production builds. Pinning
 // the replacement to the absolute package root sidesteps that.
 const require = createRequire(import.meta.url);
-const reactNativeWebEntry = require.resolve('react-native-web');
 const reactNativeWebRoot = dirname(require.resolve('react-native-web/package.json'));
+// The package's "main" field points to the CJS build, which makes Vite
+// pre-bundle a UMD shape that doesn't surface named exports (`View`,
+// `Text`, etc.). The ESM build at `dist/index.js` exports them cleanly.
+const reactNativeWebEntry = `${reactNativeWebRoot}/dist/index.js`;
+
+// Absolute path to the Reanimated web stub — resolved from the config
+// file location so it works regardless of where Vite is invoked from.
+const reanimatedStub = resolve(__dirname, '../src/mocks/reanimated.ts');
 
 export default {
   resolve: {
@@ -31,12 +47,15 @@ export default {
       { find: /^react-native$/, replacement: reactNativeWebEntry },
       // Sub-path imports: import x from 'react-native/Libraries/…'
       { find: /^react-native\//, replacement: `${reactNativeWebRoot}/` },
+      // Reanimated stub — must come after the react-native aliases so
+      // the regex for react-native/ doesn't eat this package name.
+      { find: /^react-native-reanimated$/, replacement: reanimatedStub },
     ],
     extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.tsx', '.ts', '.jsx', '.js'],
   },
   optimizeDeps: {
-    exclude: ['react-native'],
-    include: ['react-native-web'],
+    exclude: ['react-native', 'react-native-reanimated'],
+    include: ['react-native-web', 'msw', 'msw/browser'],
   },
   define: {
     __DEV__: JSON.stringify(true),

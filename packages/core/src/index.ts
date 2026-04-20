@@ -14,7 +14,24 @@ export {
 export type { GlassSurfaceProps } from './components/GlassSurface/index.js';
 
 export { GlassButton } from './components/GlassButton/index.js';
-export type { GlassButtonProps } from './components/GlassButton/index.js';
+export type {
+  GlassButtonProps,
+  GlassButtonTextProps,
+  GlassButtonIconProps,
+  GlassButtonSpinnerProps,
+  GlassButtonAction,
+  GlassButtonVariant,
+  GlassButtonSize,
+} from './components/GlassButton/index.js';
+
+export { Box, HStack, VStack } from './components/layout/index.js';
+export type {
+  BoxProps,
+  HStackProps,
+  VStackProps,
+  BoxLayoutProps,
+  SpacingValue,
+} from './components/layout/index.js';
 
 export { GlassCard } from './components/GlassCard/index.js';
 export type {
@@ -23,6 +40,9 @@ export type {
   GlassCardBodyProps,
   GlassCardFooterProps,
   GlassCardDividerProps,
+  GlassCardVariant,
+  GlassCardAction,
+  GlassCardSize,
 } from './components/GlassCard/index.js';
 
 export { GlassSheet } from './components/GlassSheet/index.js';
@@ -45,7 +65,7 @@ export type {
 } from './components/GlassToast/index.js';
 
 export { GlassInput } from './components/GlassInput/index.js';
-export type { GlassInputProps } from './components/GlassInput/index.js';
+export type { GlassInputProps, GlassInputSize } from './components/GlassInput/index.js';
 
 export { GlassSwitch } from './components/GlassSwitch/index.js';
 export type { GlassSwitchProps } from './components/GlassSwitch/index.js';
@@ -55,3 +75,6 @@ export type { GlassSliderProps } from './components/GlassSlider/index.js';
 
 export { GlassPicker } from './components/GlassPicker/index.js';
 export type { GlassPickerItem, GlassPickerProps } from './components/GlassPicker/index.js';
+
+export { useEnterExit, usePressScale, toSpringConfig, instantTiming } from './motion/index.js';
+export type { EnterExitConfig, EnterExitResult, PressScaleResult } from './motion/index.js';

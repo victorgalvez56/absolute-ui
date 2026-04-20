@@ -15,6 +15,8 @@ import {
   buildCardHeaderStyle,
   buildCardSubtitleStyle,
   buildCardTitleStyle,
+  resolveGlassCardColors,
+  resolveGlassCardSize,
 } from './style.js';
 
 const themes = [
@@ -122,5 +124,69 @@ describe('section alignment sanity', () => {
     expect(buildCardDividerStyle('#000').marginHorizontal).toBe(
       buildCardBodyStyle().paddingHorizontal,
     );
+  });
+});
+
+describe('resolveGlassCardSize', () => {
+  test('md defaults match the Phase 1 baseline', () => {
+    const md = resolveGlassCardSize('md');
+    expect(md.paddingHorizontal).toBe(20);
+    expect(md.paddingVertical).toBe(16);
+    expect(md.gap).toBe(8);
+  });
+
+  test('sm shrinks padding + gap', () => {
+    const md = resolveGlassCardSize('md');
+    const sm = resolveGlassCardSize('sm');
+    expect(sm.paddingHorizontal).toBeLessThan(md.paddingHorizontal);
+    expect(sm.paddingVertical).toBeLessThan(md.paddingVertical);
+    expect(sm.gap).toBeLessThan(md.gap);
+  });
+
+  test('lg grows padding + gap', () => {
+    const md = resolveGlassCardSize('md');
+    const lg = resolveGlassCardSize('lg');
+    expect(lg.paddingHorizontal).toBeGreaterThan(md.paddingHorizontal);
+    expect(lg.gap).toBeGreaterThan(md.gap);
+  });
+
+  test('title/subtitle font scale with size', () => {
+    const sm = buildCardTitleStyle('#fff', 'sm').fontSize;
+    const md = buildCardTitleStyle('#fff', 'md').fontSize;
+    const lg = buildCardTitleStyle('#fff', 'lg').fontSize;
+    expect(sm).toBeLessThan(md);
+    expect(md).toBeLessThan(lg);
+  });
+});
+
+describe('resolveGlassCardColors', () => {
+  const colors = aurora.colors;
+
+  test('filled variant keeps the default glass tint, no border override', () => {
+    const t = resolveGlassCardColors({ variant: 'filled', action: 'neutral', colors });
+    expect(t.useGlassSurface).toBe(true);
+    expect(t.border).toBeUndefined();
+    expect(t.tintAlphaMultiplier).toBe(1);
+  });
+
+  test('soft variant drops the tint alpha but keeps the surface', () => {
+    const t = resolveGlassCardColors({ variant: 'soft', action: 'neutral', colors });
+    expect(t.useGlassSurface).toBe(true);
+    expect(t.tintAlphaMultiplier).toBeLessThan(1);
+  });
+
+  test('outline variant paints an accent border', () => {
+    const primary = resolveGlassCardColors({ variant: 'outline', action: 'primary', colors });
+    expect(primary.border).toBe(colors.accent);
+    const danger = resolveGlassCardColors({ variant: 'outline', action: 'danger', colors });
+    expect(danger.border).toBe(colors.danger);
+    const neutral = resolveGlassCardColors({ variant: 'outline', action: 'neutral', colors });
+    expect(neutral.border).toBe(colors.textPrimary);
+  });
+
+  test('ghost variant drops the glass surface entirely', () => {
+    const t = resolveGlassCardColors({ variant: 'ghost', action: 'neutral', colors });
+    expect(t.useGlassSurface).toBe(false);
+    expect(t.border).toBeUndefined();
   });
 });

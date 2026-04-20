@@ -13,24 +13,24 @@ export type GlassSurfaceProps = Omit<ViewProps, 'style'> & {
    * recipe with more blur, more saturation, and a stronger tint.
    * Defaults to 1.
    */
-  elevation?: GlassElevation;
+  elevation?: GlassElevation | undefined;
   /**
    * Corner radius token. Defaults to `md` (12pt).
    */
-  radius?: keyof typeof radiusTokens;
+  radius?: keyof typeof radiusTokens | undefined;
   /**
    * Optional override for the theme. When omitted, reads from the
    * nearest `AbsoluteUIContext` provider (or the default theme when
    * rendered outside one).
    */
-  theme?: Theme;
+  theme?: Theme | undefined;
   /**
    * Extra style applied on top of the resolved glass style. Use for
    * layout (width / padding / margin), not for visual overrides —
    * visual overrides defeat the point of the theme contract.
    */
-  style?: ViewStyle;
-  children?: ReactNode;
+  style?: ViewStyle | undefined;
+  children?: ReactNode | undefined;
 };
 
 /**
@@ -54,7 +54,7 @@ export const GlassSurface = forwardRef<unknown, GlassSurfaceProps>(function Glas
   const theme = themeOverride ?? ctx.theme;
   const rawRecipe = theme.glass[elevation];
   const recipe = resolveGlassRecipe(rawRecipe, ctx.preferences, theme.colors.background);
-  const resolved = buildGlassSurfaceStyle(recipe, radiusTokens[radius]) as ViewStyle;
+  const resolved = buildGlassSurfaceStyle(recipe, radiusTokens[radius], elevation) as ViewStyle;
 
   return (
     <View

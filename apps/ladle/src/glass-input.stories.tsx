@@ -135,3 +135,58 @@ export const ReducedTransparency = () => (
     </Backdrop>
   </AbsoluteUIContext.Provider>
 );
+
+const Glyph = ({ color, char }: { color: string; char: string }) => (
+  <span
+    aria-hidden="true"
+    style={{ color, fontSize: 15, fontWeight: 600, lineHeight: 1, display: 'inline-block' }}
+  >
+    {char}
+  </span>
+);
+
+export const SizesAndIcons = () => (
+  <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
+    <Backdrop theme={themes.aurora}>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 460, paddingTop: 8 }}
+      >
+        <div style={{ color: themes.aurora.colors.textSecondary, fontSize: 11, fontWeight: 600 }}>
+          SIZES (sm / md / lg)
+        </div>
+        <GlassInput size="sm" label="Small" placeholder="sm" helperText="Small input" />
+        <GlassInput size="md" label="Medium (default)" placeholder="md" helperText="Medium input" />
+        <GlassInput size="lg" label="Large" placeholder="lg" helperText="Large input" />
+
+        <div
+          style={{
+            color: themes.aurora.colors.textSecondary,
+            fontSize: 11,
+            fontWeight: 600,
+            marginTop: 8,
+          }}
+        >
+          ICON SLOTS
+        </div>
+        <GlassInput
+          label="Search"
+          placeholder="Search anything…"
+          leadingIcon={<Glyph color={themes.aurora.colors.textSecondary} char="⌕" />}
+        />
+        <GlassInput
+          label="Password"
+          placeholder="••••••••"
+          secureTextEntry
+          leadingIcon={<Glyph color={themes.aurora.colors.textSecondary} char="⚿" />}
+          trailingIcon={<Glyph color={themes.aurora.colors.accent} char="◉" />}
+        />
+        <GlassInput
+          label="Amount"
+          placeholder="0.00"
+          keyboardType="decimal-pad"
+          trailingIcon={<Glyph color={themes.aurora.colors.textSecondary} char="$" />}
+        />
+      </div>
+    </Backdrop>
+  </AbsoluteUIContext.Provider>
+);

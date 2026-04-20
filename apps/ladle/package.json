@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ladle serve --port 61000",
+    "dev": "ladle serve --port 61000 --viteConfig ./.ladle/vite.config.mjs",
     "build": "ladle build --viteConfig ./.ladle/vite.config.mjs",
     "preview": "ladle preview --viteConfig ./.ladle/vite.config.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -14,14 +14,14 @@
     "@absolute-ui/a11y": "workspace:*",
     "@absolute-ui/core": "workspace:*",
     "@absolute-ui/tokens": "workspace:*",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native-web": "^0.19.13"
   },
   "devDependencies": {
     "@absolute-ui/mocks": "workspace:*",
     "@ladle/react": "^4.1.2",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0"
   }
 }

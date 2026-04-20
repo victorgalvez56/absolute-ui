@@ -31,15 +31,20 @@
   },
   "peerDependencies": {
     "react": ">=18.3.0",
-    "react-native": ">=0.76.0"
+    "react-native": ">=0.76.0",
+    "react-native-reanimated": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "react-native": {
       "optional": true
+    },
+    "react-native-reanimated": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@types/react": "^18.3.12",
+    "@types/react": "^19.2.0",
+    "react-native-reanimated": "^4.0.0",
     "reassure": "^1.0.0"
   },
   "publishConfig": {
