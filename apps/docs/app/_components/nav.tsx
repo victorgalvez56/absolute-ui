@@ -1,4 +1,4 @@
-import { LADLE_BASE } from '@/lib/ladle';
+import { STORYBOOK_BASE } from '@/lib/storybook';
 import Link from 'next/link';
 
 const primaryLinks = [
@@ -30,7 +30,7 @@ export function Nav() {
             </Link>
           ))}
           <a
-            href={LADLE_BASE}
+            href={STORYBOOK_BASE}
             target="_blank"
             rel="noreferrer"
             className="no-underline hover:underline"

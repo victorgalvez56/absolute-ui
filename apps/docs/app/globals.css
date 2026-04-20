@@ -36,7 +36,7 @@ body {
   font-family: var(--font-sans);
 }
 
-/* A subtle blur-friendly backdrop — mirrors the Ladle previews and
+/* A subtle blur-friendly backdrop — mirrors the Storybook previews and
    gives primitive swatches something photographic to refract. */
 body {
   background-image: radial-gradient(

@@ -1,4 +1,4 @@
-import { LADLE_BASE } from '@/lib/ladle';
+import { STORYBOOK_BASE } from '@/lib/storybook';
 import { primitives } from '@/lib/primitives';
 import { aurora, frost, obsidian, sunset } from '@absolute-ui/tokens';
 import Link from 'next/link';
@@ -76,7 +76,7 @@ export default function HomePage() {
               Browse the docs
             </Link>
             <a
-              href={LADLE_BASE}
+              href={STORYBOOK_BASE}
               target="_blank"
               rel="noreferrer"
               className="inline-flex h-11 items-center rounded-full border border-[color:var(--color-divider)] px-6 font-semibold no-underline"

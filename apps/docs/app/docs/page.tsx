@@ -10,7 +10,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Docs',
   description:
-    'Absolute UI documentation — primitives, screens, personalities, and the a11y + performance contracts, each linked to a live Ladle preview.',
+    'Absolute UI documentation — primitives, screens, personalities, and the a11y + performance contracts, each linked to a live Storybook preview.',
 };
 
 const guideCards = [
@@ -75,7 +75,7 @@ export default function DocsIndexPage() {
             <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">Absolute UI reference</h1>
             <p className="mt-4 max-w-2xl text-[color:var(--color-text-secondary)]">
               Every primitive, screen, and personality has a dedicated page. Previews embed the
-              real Ladle playground so you always see the production component, not a screenshot.
+              real Storybook playground so you always see the production component, not a screenshot.
               Start with the guides, or jump straight to a primitive from the sidebar.
             </p>
             <p className="mt-3 text-sm text-[color:var(--color-text-secondary)]">
