@@ -2,16 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "ladle",
+      "name": "storybook",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@absolute-ui/ladle", "dev"],
+      "runtimeArgs": ["--filter", "@absolute-ui/storybook", "dev"],
       "port": 61000
     },
     {
       "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@absolute-ui/docs", "exec", "next", "dev", "--port", "63100"],
-      "port": 63100
+      "runtimeArgs": ["--filter", "@absolute-ui/docs", "dev"],
+      "port": 63200
     }
   ]
 }
