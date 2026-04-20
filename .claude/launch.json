@@ -6,6 +6,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@absolute-ui/ladle", "dev"],
       "port": 61000
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@absolute-ui/docs", "exec", "next", "dev", "--port", "63100"],
+      "port": 63100
     }
   ]
 }
