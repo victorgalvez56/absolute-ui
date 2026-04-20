@@ -1,11 +1,16 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
-  "changelog": "@changesets/cli/changelog",
+  "changelog": ["@changesets/changelog-github", { "repo": "victorgalvez56/absolute-ui" }],
   "commit": false,
   "fixed": [],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@absolute-ui/ladle", "@absolute-ui/example"]
+  "ignore": [
+    "@absolute-ui/ladle",
+    "@absolute-ui/example",
+    "@absolute-ui/docs",
+    "@absolute-ui/visual"
+  ]
 }

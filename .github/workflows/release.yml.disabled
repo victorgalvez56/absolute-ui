@@ -12,36 +12,58 @@ jobs:
   release:
     name: version · publish
     runs-on: ubuntu-latest
+    # Permissions required for:
+    #   - contents: write → tag the release + push the "Version Packages" PR
+    #   - pull-requests: write → open/update the "Version Packages" PR
+    #   - id-token: write → npm provenance (sigstore keyless signing)
     permissions:
       contents: write
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 10.18.3
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
       - name: Build packages
-        run: pnpm -r --filter='./packages/*' run build
+        run: pnpm build:clean
 
       - name: Create Release Pull Request or Publish
+        id: changesets
         uses: changesets/action@v1
         with:
+          # `version` bumps package versions + regenerates changelogs on a PR.
+          # `publish` runs once that PR is merged to main — it rebuilds then
+          # calls `changeset publish` which pushes every package with a new
+          # version to npm and creates a matching GitHub release.
           version: pnpm version:packages
           publish: pnpm release
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
