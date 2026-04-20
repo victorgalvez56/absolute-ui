@@ -26,17 +26,26 @@ export default function HomePage() {
             the components were designed to.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link
+              href="/themes"
+              className="inline-flex h-11 items-center rounded-full bg-[color:var(--color-accent)] px-6 font-semibold no-underline"
+              style={{ color: 'var(--color-on-accent)' }}
+            >
+              Try the Theme Lab
+            </Link>
             <a
               href={LADLE_BASE}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-11 items-center rounded-full bg-[color:var(--color-accent)] px-6 font-semibold text-[color:var(--color-on-accent)] no-underline"
+              className="inline-flex h-11 items-center rounded-full border border-[color:var(--color-divider)] px-6 font-semibold no-underline"
+              style={{ color: 'var(--color-text-primary)' }}
             >
               Live playground
             </a>
             <Link
               href="/docs"
               className="inline-flex h-11 items-center rounded-full border border-[color:var(--color-divider)] px-6 font-semibold no-underline"
+              style={{ color: 'var(--color-text-primary)' }}
             >
               Browse the docs
             </Link>
@@ -53,8 +62,8 @@ export default function HomePage() {
                 Themes swap semantic colors, glass recipes, and motion identity — not just hues.
               </p>
             </div>
-            <Link href="/docs" className="text-sm no-underline hover:underline">
-              See all themes →
+            <Link href="/themes" className="text-sm no-underline hover:underline">
+              Open the Theme Lab →
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
