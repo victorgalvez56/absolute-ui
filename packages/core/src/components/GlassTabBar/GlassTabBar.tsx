@@ -1,9 +1,19 @@
 import type { ReactNode } from 'react';
-import { forwardRef } from 'react';
-import { Pressable, Text, View, type ViewStyle } from 'react-native';
+import { forwardRef, useEffect, useRef, useState } from 'react';
+import { Pressable, Text, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { spring } from '@absolute-ui/tokens';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
+import { toSpringConfig, instantTiming } from '../../motion/presets.js';
+import { usePressScale } from '../../motion/index.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
-import { buildTabBarContainerStyle, buildTabItemStyle, buildTabLabelStyle } from './style.js';
+import {
+  buildTabBarContainerStyle,
+  buildTabIndicatorBaseStyle,
+  buildTabItemStyle,
+  buildTabLabelStyle,
+} from './style.js';
 
 export type GlassTabBarItem = {
   /** Stable identifier used by `activeKey` and `onTabPress`. */
@@ -33,61 +43,138 @@ export type GlassTabBarProps = {
   style?: ViewStyle;
 };
 
+// ----- TabItem sub-component -----
+
+type TabItemProps = {
+  item: GlassTabBarItem;
+  active: boolean;
+  textColor: string;
+  accentColor: string;
+  onPress: (key: string) => void;
+};
+
 /**
- * Bottom tab bar. A glass surface with a horizontal row of tabs,
- * each enforcing the 44x44 hit target. Active state is communicated
- * via two non-color cues: the label weight steps from 500 to 700,
- * and the item renders a 2pt structural underline in the theme's
- * accent color (inactive tabs paint the same border in
- * `transparent` so the layout stays stable across state changes).
+ * Each tab item owns its own usePressScale hook so the hook rules
+ * (no conditional calls) are respected. The press animation is
+ * applied to an AnimatedView wrapping the Pressable.
+ */
+function TabItem({ item, active, textColor, onPress }: TabItemProps) {
+  const { onPressIn, onPressOut, pressStyle } = usePressScale();
+  const itemStyle = buildTabItemStyle({ active });
+  const labelStyle = buildTabLabelStyle({ color: textColor, active });
+  const label = item.accessibilityLabel ?? `${item.label}, tab`;
+
+  return (
+    <AnimatedView style={[itemStyle, pressStyle]}>
+      <Pressable
+        onPress={() => onPress(item.key)}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityState={{ selected: active }}
+        style={{ flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' }}
+      >
+        {item.leading ?? null}
+        <Text style={labelStyle}>{item.label}</Text>
+      </Pressable>
+    </AnimatedView>
+  );
+}
+
+// ----- GlassTabBar -----
+
+type TabLayout = { x: number; width: number };
+const snappyCfg = toSpringConfig(spring.snappy);
+
+/**
+ * Bottom tab bar with a sliding accent indicator and per-tab press
+ * scale feedback.
  *
- * Accessibility: `react-native`'s AccessibilityRole shim does not
- * include `tab` / `tablist`, so the container falls back to `list`
- * and each item to `button`. VoiceOver still announces the tab
- * name via the Pressable's label, and `accessibilityState.selected`
- * reports the active tab. When the shim gains `tab` / `tablist`,
- * swap both roles in one place without touching the behavior.
+ * The indicator is an absolutely-positioned bar whose translateX and
+ * width animate via the 'snappy' spring whenever activeKey changes.
+ * On first layout the indicator snaps to the active tab position
+ * without animating. Reduced Motion: instant jump instead of spring.
+ *
+ * Accessibility: container uses role="list", each tab uses role="button"
+ * with accessibilityState.selected. The structural indicator (shape
+ * change + weight change) is the non-color active-state cue.
  */
 export const GlassTabBar = forwardRef<unknown, GlassTabBarProps>(function GlassTabBar(
   { items, activeKey, onTabPress, elevation = 2, radius = '2xl', style },
   _ref,
 ) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
+
+  // Track each tab's x + width after layout.
+  const [tabLayouts, setTabLayouts] = useState<Record<string, TabLayout>>({});
+  // Whether the indicator has been positioned for the first time.
+  const initialPositioned = useRef(false);
+
+  // Animated shared values for the indicator.
+  const indicatorX = useSharedValue(0);
+  const indicatorWidth = useSharedValue(0);
+
+  // Slide the indicator whenever the active key changes or new
+  // layouts arrive.
+  useEffect(() => {
+    const layout = tabLayouts[activeKey];
+    if (layout === undefined) return;
+
+    if (!initialPositioned.current) {
+      // First time: snap to position, no spring.
+      initialPositioned.current = true;
+      indicatorX.value = layout.x;
+      indicatorWidth.value = layout.width;
+      return;
+    }
+
+    if (preferences.reducedMotion) {
+      indicatorX.value = withTiming(layout.x, instantTiming);
+      indicatorWidth.value = withTiming(layout.width, instantTiming);
+    } else {
+      indicatorX.value = withSpring(layout.x, snappyCfg);
+      indicatorWidth.value = withSpring(layout.width, snappyCfg);
+    }
+  }, [activeKey, tabLayouts, preferences.reducedMotion]);
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    width: indicatorWidth.value,
+    transform: [{ translateX: indicatorX.value }],
+  }));
+
   const containerStyle = buildTabBarContainerStyle();
+  const indicatorBaseStyle = buildTabIndicatorBaseStyle(theme.colors.accent);
   const styleProps = style !== undefined ? { style } : {};
+
+  const handleTabLayout = (key: string, e: LayoutChangeEvent) => {
+    const { x, width } = e.nativeEvent.layout;
+    setTabLayouts((prev) => ({ ...prev, [key]: { x, width } }));
+  };
 
   return (
     <GlassSurface elevation={elevation} radius={radius} {...styleProps} accessibilityRole="none">
-      <View style={containerStyle} accessibilityRole="list">
+      <View style={[containerStyle, { position: 'relative' }]} accessibilityRole="list">
         {items.map((item) => {
           const active = item.key === activeKey;
-          const itemStyle = buildTabItemStyle({
-            active,
-            accentColor: theme.colors.accent,
-          });
-          // Always use textPrimary for the label. Dimming to textSecondary
-          // previously broke the APCA Lc 60 floor on all four themes.
-          // Active vs inactive is conveyed by weight + underline, not color.
-          const labelStyle = buildTabLabelStyle({
-            color: theme.colors.textPrimary,
-            active,
-          });
-          const label = item.accessibilityLabel ?? item.label;
-
           return (
-            <Pressable
+            <View
               key={item.key}
-              style={itemStyle}
-              onPress={() => onTabPress(item.key)}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-              accessibilityState={{ selected: active }}
+              style={{ flex: 1 }}
+              onLayout={(e) => handleTabLayout(item.key, e)}
             >
-              {item.leading ?? null}
-              <Text style={labelStyle}>{item.label}</Text>
-            </Pressable>
+              <TabItem
+                item={item}
+                active={active}
+                textColor={theme.colors.textPrimary}
+                accentColor={theme.colors.accent}
+                onPress={onTabPress}
+              />
+            </View>
           );
         })}
+        {/* Sliding indicator overlaid at the bottom of the row. */}
+        <AnimatedView style={[indicatorBaseStyle, indicatorStyle]} pointerEvents="none" />
       </View>
     </GlassSurface>
   );

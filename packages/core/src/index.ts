@@ -75,3 +75,6 @@ export type { GlassSliderProps } from './components/GlassSlider/index.js';
 
 export { GlassPicker } from './components/GlassPicker/index.js';
 export type { GlassPickerItem, GlassPickerProps } from './components/GlassPicker/index.js';
+
+export { useEnterExit, usePressScale, toSpringConfig, instantTiming } from './motion/index.js';
+export type { EnterExitConfig, EnterExitResult, PressScaleResult } from './motion/index.js';

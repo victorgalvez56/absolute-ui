@@ -6,14 +6,28 @@
  *
  * This shim intentionally grows as new primitives are added — when
  * you reach for a new RN API, add its types here.
+ *
+ * Implementation notes
+ * --------------------
+ * • All optional props include `| undefined` explicitly because
+ *   the tsconfigs in this repo enable `exactOptionalPropertyTypes`.
+ * • Component functions return `any` to bypass a React 18 vs 19
+ *   ReactElement structural mismatch. This shim's `import from 'react'`
+ *   resolves to the workspace-root @types/react@19 (hoisted by
+ *   apps/example), while packages/core's own compilation uses
+ *   @types/react@18 from its local node_modules. The two ReactElement
+ *   definitions differ in the default type param (any vs unknown),
+ *   causing TS2786 whenever both are visible in the same compilation.
+ *   Using `any` as the return type keeps full prop-type checking while
+ *   sidestepping the irresolvable cross-version JSX element check.
  */
 declare module 'react-native' {
-  import type { ComponentType, CSSProperties, ReactNode, Ref } from 'react';
+  import type { CSSProperties, ReactNode, Ref } from 'react';
 
   export type ViewStyle = CSSProperties & {
     // Extra fields used by GlassSurface on web that aren't in CSSProperties
-    backdropFilter?: string;
-    WebkitBackdropFilter?: string;
+    backdropFilter?: string | undefined;
+    WebkitBackdropFilter?: string | undefined;
   };
 
   export type TextStyle = ViewStyle;
@@ -35,18 +49,18 @@ declare module 'react-native' {
     | 'radiogroup';
 
   export type AccessibilityState = {
-    disabled?: boolean;
-    selected?: boolean;
-    checked?: boolean | 'mixed';
-    busy?: boolean;
-    expanded?: boolean;
+    disabled?: boolean | undefined;
+    selected?: boolean | undefined;
+    checked?: boolean | 'mixed' | undefined;
+    busy?: boolean | undefined;
+    expanded?: boolean | undefined;
   };
 
   export type AccessibilityValue = {
-    min?: number;
-    max?: number;
-    now?: number;
-    text?: string;
+    min?: number | undefined;
+    max?: number | undefined;
+    now?: number | undefined;
+    text?: string | undefined;
   };
 
   export type LayoutChangeEvent = {
@@ -88,8 +102,8 @@ declare module 'react-native' {
 
   export type PressableStateCallbackType = {
     pressed: boolean;
-    hovered?: boolean;
-    focused?: boolean;
+    hovered?: boolean | undefined;
+    focused?: boolean | undefined;
   };
 
   export type PressableProps = Omit<ViewProps, 'style' | 'children'> & {
@@ -151,9 +165,15 @@ declare module 'react-native' {
     'aria-invalid'?: boolean | undefined;
   };
 
-  export const View: ComponentType<ViewProps>;
-  export const Text: ComponentType<TextProps>;
-  export const Pressable: ComponentType<PressableProps>;
-  export const ScrollView: ComponentType<ScrollViewProps>;
-  export const TextInput: ComponentType<TextInputProps>;
+  // Components return `any` — see the file-level comment above for why.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function View(props: ViewProps): any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function Text(props: TextProps): any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function Pressable(props: PressableProps): any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function ScrollView(props: ScrollViewProps): any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function TextInput(props: TextInputProps): any;
 }
