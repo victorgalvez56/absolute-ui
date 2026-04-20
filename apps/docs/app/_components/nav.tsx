@@ -16,6 +16,9 @@ export function Nav() {
           <span>Absolute UI</span>
         </Link>
         <div className="flex items-center gap-6 text-sm">
+          <Link href="/themes" className="no-underline hover:underline">
+            Theme Lab
+          </Link>
           <Link href="/docs" className="no-underline hover:underline">
             Docs
           </Link>
