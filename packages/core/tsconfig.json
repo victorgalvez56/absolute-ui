@@ -7,7 +7,12 @@
     // Pin @types resolution to this package's local node_modules so the
     // workspace-root @types/react@19 (hoisted by apps/example) doesn't
     // leak in and conflict with @types/react@18 declared here.
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    // The local react-native shim (types/react-native.d.ts) declares props
+    // as `accessibilityLabel?: string` — idiomatic for RN, but incompatible
+    // with exactOptionalPropertyTypes when callers pass `string | undefined`.
+    // Turning this off here matches how the real RN types behave.
+    "exactOptionalPropertyTypes": false
   },
   "include": ["src/**/*", "../../types/**/*"],
   "exclude": ["dist", "node_modules", "src/**/*.perf.tsx", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test-utils/**/*"]
