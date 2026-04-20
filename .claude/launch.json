@@ -10,8 +10,8 @@
     {
       "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@absolute-ui/docs", "dev"],
-      "port": 63200
+      "runtimeArgs": ["--filter", "@absolute-ui/docs", "exec", "next", "dev", "--port", "63210"],
+      "port": 63210
     }
   ]
 }
