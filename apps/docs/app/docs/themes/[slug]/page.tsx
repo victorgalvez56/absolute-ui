@@ -1,3 +1,4 @@
+import { DocsSidebar } from '@/app/_components/docs-sidebar';
 import { type Theme, themes } from '@absolute-ui/tokens';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import { Nav } from '../../../_components/nav';
 
 type Params = { slug: string };
 
-const themeSlugs = Object.keys(themes) as Array<keyof typeof themes>;
+const themeSlugs: string[] = Object.keys(themes);
 
 export function generateStaticParams(): Params[] {
   return themeSlugs.map((slug) => ({ slug }));
@@ -57,7 +58,9 @@ export default async function ThemePage({
   return (
     <>
       <Nav />
-      <main className="mx-auto max-w-6xl px-6 pb-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-16 sm:px-6 lg:flex-row lg:gap-10">
+        <DocsSidebar />
+        <main className="min-w-0 flex-1">
         <nav aria-label="Breadcrumb" className="pt-8 text-sm">
           <Link
             href="/docs"
@@ -122,8 +125,8 @@ export default async function ThemePage({
           <h2 id="colors-heading" className="text-xl font-semibold">
             Colors
           </h2>
-          <div className="mt-4 overflow-hidden rounded-xl border border-[color:var(--color-divider)]">
-            <table className="w-full border-collapse text-left text-sm">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-[color:var(--color-divider)]">
+            <table className="w-full min-w-[420px] border-collapse text-left text-sm">
               <thead className="bg-[color-mix(in_oklab,var(--color-divider)_60%,transparent)]">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Role</th>
@@ -167,7 +170,8 @@ export default async function ThemePage({
             })}
           </div>
         </section>
-      </main>
+        </main>
+      </div>
       <Footer />
     </>
   );
