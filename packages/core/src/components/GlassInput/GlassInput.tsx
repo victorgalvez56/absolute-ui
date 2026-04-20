@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import {
   Text,
   TextInput,
@@ -8,7 +8,11 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { spring } from '@absolute-ui/tokens';
 import { useAbsoluteUI } from '../../theme-context.js';
+import { AnimatedView } from '../../motion/animated.js';
+import { instantTiming, toSpringConfig } from '../../motion/presets.js';
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface/index.js';
 import {
   type GlassInputSize,
@@ -23,6 +27,11 @@ import {
   resolveGlassInputPlaceholderColor,
   resolveGlassInputSize,
 } from './style.js';
+
+const gentleCfg = toSpringConfig(spring.gentle);
+// Focus state adds a subtle 0.6% lift. Small enough that it never
+// reflows siblings but perceptible enough to communicate "active".
+const FOCUS_LIFT = 0.006;
 
 export type GlassInputProps = {
   /**
@@ -145,6 +154,11 @@ export type GlassInputProps = {
  *     Type scales the text; the container's `minHeight: 44` +
  *     lineHeight 22 keeps the scaled text readable up to the 200%
  *     accessibility size without clipping.
+ *   - Motion: the surface gently springs (scale 1→1.006) on focus and
+ *     back on blur using the `gentle` spring token, communicating
+ *     "active" without ever reflowing siblings. Reduced Motion swaps
+ *     the spring for zero-duration timing so AT users see no
+ *     transition at all.
  *
  * Every styling + a11y decision is delegated to `./style.ts` so the
  * node-only vitest suite can exercise them without a DOM.
@@ -181,7 +195,7 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
   },
   _ref,
 ) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
   const [focused, setFocused] = useState(false);
 
   const handleFocus = useCallback(() => {
@@ -192,6 +206,21 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
     setFocused(false);
     onBlur?.();
   }, [onBlur]);
+
+  // Motion: spring the focus intensity (0..1). `useAnimatedStyle`
+  // reads it and drives a tiny `scale` lift so focused fields visibly
+  // activate without shifting layout.
+  const focusIntensity = useSharedValue(focused ? 1 : 0);
+  useEffect(() => {
+    const target = focused ? 1 : 0;
+    focusIntensity.value = preferences.reducedMotion
+      ? withTiming(target, instantTiming)
+      : withSpring(target, gentleCfg);
+  }, [focused, preferences.reducedMotion]);
+
+  const surfaceAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + focusIntensity.value * FOCUS_LIFT }],
+  }));
 
   const interactive = isGlassInputInteractive({ disabled, editable });
   const errorColor = theme.colors.danger;
@@ -247,41 +276,43 @@ export const GlassInput = forwardRef<unknown, GlassInputProps>(function GlassInp
   return (
     <View style={style}>
       {label !== undefined ? <Text style={labelStyle}>{label}</Text> : null}
-      <GlassSurface elevation={elevation} radius={radius} style={containerStyle}>
-        {leadingIcon !== undefined ? (
-          <View accessibilityRole="none" style={iconBoxStyle}>
-            {leadingIcon}
-          </View>
-        ) : null}
-        <TextInput
-          accessibilityLabel={resolvedLabel}
-          accessibilityHint={resolvedHint}
-          accessibilityState={a11yState}
-          aria-invalid={invalid}
-          value={value}
-          defaultValue={defaultValue}
-          placeholder={placeholder}
-          placeholderTextColor={placeholderColor}
-          editable={interactive}
-          secureTextEntry={secureTextEntry}
-          keyboardType={keyboardType}
-          autoCapitalize={autoCapitalize}
-          autoCorrect={autoCorrect}
-          autoFocus={autoFocus}
-          maxLength={maxLength}
-          returnKeyType={returnKeyType}
-          onChangeText={onChangeText}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onSubmitEditing={onSubmitEditing}
-          style={inputStyleWithFlex}
-        />
-        {trailingIcon !== undefined ? (
-          <View accessibilityRole="none" style={iconBoxStyle}>
-            {trailingIcon}
-          </View>
-        ) : null}
-      </GlassSurface>
+      <AnimatedView style={surfaceAnimStyle}>
+        <GlassSurface elevation={elevation} radius={radius} style={containerStyle}>
+          {leadingIcon !== undefined ? (
+            <View accessibilityRole="none" style={iconBoxStyle}>
+              {leadingIcon}
+            </View>
+          ) : null}
+          <TextInput
+            accessibilityLabel={resolvedLabel}
+            accessibilityHint={resolvedHint}
+            accessibilityState={a11yState}
+            aria-invalid={invalid}
+            value={value}
+            defaultValue={defaultValue}
+            placeholder={placeholder}
+            placeholderTextColor={placeholderColor}
+            editable={interactive}
+            secureTextEntry={secureTextEntry}
+            keyboardType={keyboardType}
+            autoCapitalize={autoCapitalize}
+            autoCorrect={autoCorrect}
+            autoFocus={autoFocus}
+            maxLength={maxLength}
+            returnKeyType={returnKeyType}
+            onChangeText={onChangeText}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onSubmitEditing={onSubmitEditing}
+            style={inputStyleWithFlex}
+          />
+          {trailingIcon !== undefined ? (
+            <View accessibilityRole="none" style={iconBoxStyle}>
+              {trailingIcon}
+            </View>
+          ) : null}
+        </GlassSurface>
+      </AnimatedView>
       {visibleHelper !== undefined ? <Text style={helperStyle}>{visibleHelper}</Text> : null}
     </View>
   );
