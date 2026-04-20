@@ -7,9 +7,7 @@ import { View } from 'react-native';
 
 function ThemeWrapper({ children }: { children: ReactNode }) {
   return (
-    <AbsoluteUIContext.Provider
-      value={{ theme: themes.aurora, preferences: defaultPreferences }}
-    >
+    <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
       <View style={{ flex: 1, padding: 16, backgroundColor: themes.aurora.colors.background }}>
         {children}
       </View>
@@ -26,7 +24,13 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [(Story) => <ThemeWrapper><Story /></ThemeWrapper>],
+  decorators: [
+    (Story) => (
+      <ThemeWrapper>
+        <Story />
+      </ThemeWrapper>
+    ),
+  ],
 };
 
 export default preview;
