@@ -1,20 +1,6 @@
-// @vitest-environment jsdom
-/**
- * GlassSwitch render tests.
- *
- * Covers: role mapping, label rendering, controlled + uncontrolled
- * toggle flow, disabled prevents change, decorative (no handler)
- * behaves as disabled, and custom accessibilityLabel overrides.
- *
- * The Reanimated stub makes the thumb-slide animation instant and
- * synchronous, so assertions on value state run in the same tick.
- *
- * Pure layout helper tests live in GlassSwitch.test.ts (node env).
- */
-import React from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GlassSwitch } from './GlassSwitch.js';
 import { cleanup, fireEvent, renderWithTheme } from '../../test-utils/render.js';
+import { GlassSwitch } from './GlassSwitch.js';
 
 afterEach(cleanup);
 

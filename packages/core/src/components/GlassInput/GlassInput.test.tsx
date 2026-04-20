@@ -1,17 +1,6 @@
-// @vitest-environment jsdom
-/**
- * GlassInput render tests.
- *
- * Covers: label / helper / error text rendering, controlled vs
- * uncontrolled value flow, focus/blur handler plumbing, accessibility
- * label priority, aria-invalid wiring, and disabled/read-only gating.
- *
- * Pure style/a11y helper tests live in GlassInput.test.ts (node env).
- */
-import React from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GlassInput } from './GlassInput.js';
 import { cleanup, fireEvent, renderWithTheme } from '../../test-utils/render.js';
+import { GlassInput } from './GlassInput.js';
 
 afterEach(cleanup);
 
@@ -86,9 +75,7 @@ describe('GlassInput — accessibility', () => {
     // not emit aria-disabled on <input>; the readonly contract is the
     // DOM truth for "not editable". `disabled` (our prop) flows through
     // isGlassInputInteractive → editable=false on the RN TextInput.
-    const { getByPlaceholderText } = renderWithTheme(
-      <GlassInput placeholder="Email" disabled />,
-    );
+    const { getByPlaceholderText } = renderWithTheme(<GlassInput placeholder="Email" disabled />);
     expect(getByPlaceholderText('Email').hasAttribute('readonly')).toBe(true);
   });
 

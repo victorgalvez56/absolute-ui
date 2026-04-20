@@ -1,3 +1,4 @@
+import { spring } from '@absolute-ui/tokens';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   type KeyboardEventLike,
@@ -9,10 +10,9 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-import { spring } from '@absolute-ui/tokens';
-import { useAbsoluteUI } from '../../theme-context.js';
 import { AnimatedView } from '../../motion/animated.js';
 import { instantTiming, toSpringConfig } from '../../motion/presets.js';
+import { useAbsoluteUI } from '../../theme-context.js';
 import {
   type GlassPickerItem,
   buildGlassPickerContainerStyle,

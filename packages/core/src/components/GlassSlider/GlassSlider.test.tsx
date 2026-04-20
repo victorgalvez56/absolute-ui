@@ -1,19 +1,19 @@
-// @vitest-environment jsdom
-/**
- * GlassSlider render tests.
- *
- * Covers: label + value readout rendering, role="adjustable",
- * keyboard navigation (Arrow / Home / End / Page), controlled vs
- * uncontrolled value propagation, and disabled behavior.
- *
- * Pure numeric/style helper tests live in GlassSlider.test.ts (node env).
- */
-import React from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GlassSlider } from './GlassSlider.js';
 import { cleanup, fireEvent, renderWithTheme } from '../../test-utils/render.js';
+import { GlassSlider } from './GlassSlider.js';
 
 afterEach(cleanup);
+
+/**
+ * RN-web maps accessibilityRole="adjustable" → DOM role="slider". Grab
+ * the matching element or throw — a missing slider is a render failure
+ * and the thrown error points directly at the broken contract.
+ */
+function sliderIn(container: HTMLElement): HTMLElement {
+  const el = container.querySelector('[role="slider"]');
+  if (!el) throw new Error('No role="slider" element found in container');
+  return el as HTMLElement;
+}
 
 describe('GlassSlider — rendering', () => {
   test('renders the visible label', () => {
@@ -122,7 +122,7 @@ describe('GlassSlider — keyboard', () => {
     const { container } = renderWithTheme(
       <GlassSlider label="Volume" defaultValue={50} step={1} onValueChange={onValueChange} />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'ArrowLeft' });
+    fireEvent.keyDown(sliderIn(container), { key: 'ArrowLeft' });
     expect(onValueChange).toHaveBeenCalledWith(49);
   });
 
@@ -137,7 +137,7 @@ describe('GlassSlider — keyboard', () => {
         onValueChange={onValueChange}
       />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'Home' });
+    fireEvent.keyDown(sliderIn(container), { key: 'Home' });
     expect(onValueChange).toHaveBeenCalledWith(0);
   });
 
@@ -152,7 +152,7 @@ describe('GlassSlider — keyboard', () => {
         onValueChange={onValueChange}
       />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'End' });
+    fireEvent.keyDown(sliderIn(container), { key: 'End' });
     expect(onValueChange).toHaveBeenCalledWith(100);
   });
 
@@ -161,7 +161,7 @@ describe('GlassSlider — keyboard', () => {
     const { container } = renderWithTheme(
       <GlassSlider label="Volume" defaultValue={50} step={1} onValueChange={onValueChange} />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'PageUp' });
+    fireEvent.keyDown(sliderIn(container), { key: 'PageUp' });
     expect(onValueChange).toHaveBeenCalledWith(60);
   });
 
@@ -170,21 +170,16 @@ describe('GlassSlider — keyboard', () => {
     const { container } = renderWithTheme(
       <GlassSlider label="Volume" defaultValue={50} onValueChange={onValueChange} />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'a' });
+    fireEvent.keyDown(sliderIn(container), { key: 'a' });
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
   test('disabled slider ignores keyboard input', () => {
     const onValueChange = vi.fn();
     const { container } = renderWithTheme(
-      <GlassSlider
-        label="Volume"
-        disabled
-        defaultValue={50}
-        onValueChange={onValueChange}
-      />,
+      <GlassSlider label="Volume" disabled defaultValue={50} onValueChange={onValueChange} />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'ArrowRight' });
+    fireEvent.keyDown(sliderIn(container), { key: 'ArrowRight' });
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
@@ -197,7 +192,7 @@ describe('GlassSlider — keyboard', () => {
         onValueChange={() => {}}
       />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'ArrowRight' });
+    fireEvent.keyDown(sliderIn(container), { key: 'ArrowRight' });
     expect(getByText('51%')).toBeTruthy();
   });
 });
@@ -234,7 +229,7 @@ describe('GlassSlider — controlled vs uncontrolled', () => {
         onValueChange={onValueChange}
       />,
     );
-    fireEvent.keyDown(container.querySelector('[role="slider"]')!, { key: 'ArrowRight' });
+    fireEvent.keyDown(sliderIn(container), { key: 'ArrowRight' });
     expect(onValueChange).toHaveBeenCalledWith(31);
     // value prop still 30 — readout stays at 30%
     expect(getByText('30%')).toBeTruthy();

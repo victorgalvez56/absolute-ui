@@ -133,9 +133,7 @@ export const ReducedMotion = () => {
   const [right, setRight] = useState<RangeValue>('week');
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, padding: 24 }}>
-      <AbsoluteUIContext.Provider
-        value={{ theme: themes.aurora, preferences: defaultPreferences }}
-      >
+      <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
         <Backdrop theme={themes.aurora}>
           <div
             style={{

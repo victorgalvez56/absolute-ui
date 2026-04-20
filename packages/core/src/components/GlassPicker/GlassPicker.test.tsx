@@ -1,18 +1,6 @@
-// @vitest-environment jsdom
-/**
- * GlassPicker render tests.
- *
- * Covers: segment label rendering, radiogroup / radio role mapping,
- * selection via tap (controlled + uncontrolled), keyboard navigation
- * (ArrowLeft/Right with wrap and disabled-skip, Home/End), and
- * disabled-state propagation.
- *
- * Pure helper tests live in GlassPicker.test.ts (node env).
- */
-import React from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GlassPicker, type GlassPickerItem } from './GlassPicker.js';
 import { cleanup, fireEvent, renderWithTheme } from '../../test-utils/render.js';
+import { GlassPicker, type GlassPickerItem } from './GlassPicker.js';
 
 afterEach(cleanup);
 
@@ -21,6 +9,17 @@ const ITEMS: readonly GlassPickerItem<string>[] = [
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
 ];
+
+/**
+ * Pick a radio by its accessibility label. Throws if absent so the
+ * failure message carries the missing label — cheaper to debug than
+ * a `!`-then-undefined runtime error.
+ */
+function radio(radios: HTMLElement[], label: string): HTMLElement {
+  const el = radios.find((r) => r.getAttribute('aria-label') === label);
+  if (!el) throw new Error(`No radio with aria-label="${label}"`);
+  return el;
+}
 
 describe('GlassPicker — rendering', () => {
   test('renders every segment label', () => {
@@ -34,12 +33,7 @@ describe('GlassPicker — rendering', () => {
 
   test('renders the optional group label above the row', () => {
     const { getByText } = renderWithTheme(
-      <GlassPicker
-        label="Range"
-        items={ITEMS}
-        defaultValue="day"
-        onValueChange={() => {}}
-      />,
+      <GlassPicker label="Range" items={ITEMS} defaultValue="day" onValueChange={() => {}} />,
     );
     expect(getByText('Range')).toBeTruthy();
   });
@@ -107,8 +101,7 @@ describe('GlassPicker — interaction', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const weekBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Week');
-    fireEvent.click(weekBtn!);
+    fireEvent.click(radio(getAllByRole('radio'), 'Week'));
     expect(onValueChange).toHaveBeenCalledWith('week');
   });
 
@@ -117,8 +110,7 @@ describe('GlassPicker — interaction', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const dayBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Day');
-    fireEvent.click(dayBtn!);
+    fireEvent.click(radio(getAllByRole('radio'), 'Day'));
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
@@ -127,8 +119,7 @@ describe('GlassPicker — interaction', () => {
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={() => {}} />,
     );
     expect(getByText('Day').style.fontWeight).toBe('600');
-    const weekBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Week');
-    fireEvent.click(weekBtn!);
+    fireEvent.click(radio(getAllByRole('radio'), 'Week'));
     expect(getByText('Week').style.fontWeight).toBe('600');
     expect(getByText('Day').style.fontWeight).toBe('500');
   });
@@ -136,15 +127,9 @@ describe('GlassPicker — interaction', () => {
   test('disabled group blocks selection', () => {
     const onValueChange = vi.fn();
     const { getAllByRole } = renderWithTheme(
-      <GlassPicker
-        items={ITEMS}
-        disabled
-        defaultValue="day"
-        onValueChange={onValueChange}
-      />,
+      <GlassPicker items={ITEMS} disabled defaultValue="day" onValueChange={onValueChange} />,
     );
-    const weekBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Week');
-    fireEvent.click(weekBtn!);
+    fireEvent.click(radio(getAllByRole('radio'), 'Week'));
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
@@ -158,12 +143,10 @@ describe('GlassPicker — interaction', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={items} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const byLabel = Object.fromEntries(
-      getAllByRole('radio').map((r) => [r.getAttribute('aria-label'), r] as const),
-    );
-    fireEvent.click(byLabel.Week!);
+    const radios = getAllByRole('radio');
+    fireEvent.click(radio(radios, 'Week'));
     expect(onValueChange).not.toHaveBeenCalled();
-    fireEvent.click(byLabel.Month!);
+    fireEvent.click(radio(radios, 'Month'));
     expect(onValueChange).toHaveBeenCalledWith('month');
   });
 });
@@ -174,8 +157,7 @@ describe('GlassPicker — keyboard', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const dayBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Day');
-    fireEvent.keyDown(dayBtn!, { key: 'ArrowRight' });
+    fireEvent.keyDown(radio(getAllByRole('radio'), 'Day'), { key: 'ArrowRight' });
     expect(onValueChange).toHaveBeenCalledWith('week');
   });
 
@@ -184,8 +166,7 @@ describe('GlassPicker — keyboard', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const dayBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Day');
-    fireEvent.keyDown(dayBtn!, { key: 'ArrowLeft' });
+    fireEvent.keyDown(radio(getAllByRole('radio'), 'Day'), { key: 'ArrowLeft' });
     expect(onValueChange).toHaveBeenCalledWith('month');
   });
 
@@ -194,10 +175,7 @@ describe('GlassPicker — keyboard', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="month" onValueChange={onValueChange} />,
     );
-    const monthBtn = getAllByRole('radio').find(
-      (r) => r.getAttribute('aria-label') === 'Month',
-    );
-    fireEvent.keyDown(monthBtn!, { key: 'Home' });
+    fireEvent.keyDown(radio(getAllByRole('radio'), 'Month'), { key: 'Home' });
     expect(onValueChange).toHaveBeenCalledWith('day');
   });
 
@@ -206,8 +184,7 @@ describe('GlassPicker — keyboard', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={ITEMS} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const dayBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Day');
-    fireEvent.keyDown(dayBtn!, { key: 'End' });
+    fireEvent.keyDown(radio(getAllByRole('radio'), 'Day'), { key: 'End' });
     expect(onValueChange).toHaveBeenCalledWith('month');
   });
 
@@ -221,8 +198,7 @@ describe('GlassPicker — keyboard', () => {
     const { getAllByRole } = renderWithTheme(
       <GlassPicker items={items} defaultValue="day" onValueChange={onValueChange} />,
     );
-    const dayBtn = getAllByRole('radio').find((r) => r.getAttribute('aria-label') === 'Day');
-    fireEvent.keyDown(dayBtn!, { key: 'ArrowRight' });
+    fireEvent.keyDown(radio(getAllByRole('radio'), 'Day'), { key: 'ArrowRight' });
     expect(onValueChange).toHaveBeenCalledWith('month');
   });
 });
