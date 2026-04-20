@@ -2,22 +2,39 @@
   "name": "@absolute-ui/a11y",
   "version": "0.0.0",
   "description": "Accessibility utilities for Absolute UI — APCA contrast, preference resolvers, focus ring.",
+  "license": "MIT",
+  "author": "Absolute UI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victorgalvez56/absolute-ui.git",
+    "directory": "packages/a11y"
+  },
+  "bugs": {
+    "url": "https://github.com/victorgalvez56/absolute-ui/issues"
+  },
+  "homepage": "https://github.com/victorgalvez56/absolute-ui/tree/main/packages/a11y#readme",
+  "keywords": ["absolute-ui", "accessibility", "a11y", "apca", "contrast", "react-native"],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "files": ["dist", "README.md"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "tsup",
+    "clean": "rm -rf dist",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "prepublishOnly": "pnpm run clean && pnpm run build"
@@ -27,6 +44,7 @@
     "@absolute-ui/tokens": "workspace:*"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }
