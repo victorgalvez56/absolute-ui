@@ -2,27 +2,45 @@
   "name": "@absolute-ui/tokens",
   "version": "0.0.0",
   "description": "Design tokens and personality themes for Absolute UI.",
+  "license": "MIT",
+  "author": "Absolute UI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victorgalvez56/absolute-ui.git",
+    "directory": "packages/tokens"
+  },
+  "bugs": {
+    "url": "https://github.com/victorgalvez56/absolute-ui/issues"
+  },
+  "homepage": "https://github.com/victorgalvez56/absolute-ui/tree/main/packages/tokens#readme",
+  "keywords": ["absolute-ui", "design-tokens", "react-native", "liquid-glass", "theme"],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "files": ["dist", "README.md"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "tsup",
+    "clean": "rm -rf dist",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "pnpm run clean && pnpm run build"
   },
   "sideEffects": false,
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

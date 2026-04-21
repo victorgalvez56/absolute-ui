@@ -54,12 +54,8 @@ const config = {
     // extraNodeModules alias kicks in, producing two React instances
     // in the same bundle → dispatcher.useContext is null.
     blockList: [
-      new RegExp(
-        `${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react/.*`,
-      ),
-      new RegExp(
-        `${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react-native/.*`,
-      ),
+      new RegExp(`${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react/.*`),
+      new RegExp(`${path.resolve(workspaceRoot, 'packages')}/[^/]+/node_modules/react-native/.*`),
     ],
     disableHierarchicalLookup: false,
   },
