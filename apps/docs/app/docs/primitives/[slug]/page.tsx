@@ -4,7 +4,7 @@ import { Footer } from '@/app/_components/footer';
 import { Nav } from '@/app/_components/nav';
 import { SlugPlayground } from '@/app/_components/playground/SlugPlayground';
 import { hasDemo } from '@/lib/demos';
-import { LADLE_BASE, ladlePreviewUrl } from '@/lib/ladle';
+import { storybookPreviewUrl, storybookStoryUrl } from '@/lib/storybook';
 import {
   findPrimitive,
   findScreen,
@@ -102,8 +102,8 @@ export default async function PrimitivePage({
   const entry = primitive ?? screen;
   if (!entry) notFound();
 
-  const previewUrl = ladlePreviewUrl(entry.storyId);
-  const externalUrl = `${LADLE_BASE}/?story=${encodeURIComponent(entry.storyId)}`;
+  const previewUrl = storybookPreviewUrl(entry.storyId);
+  const externalUrl = storybookStoryUrl(entry.storyId);
 
   return (
     <>
@@ -171,7 +171,7 @@ export default async function PrimitivePage({
                 rel="noreferrer"
                 className="text-sm no-underline hover:underline"
               >
-                Open in Ladle ↗
+                Open in Storybook ↗
               </a>
             </div>
             {hasDemo(slug) ? (
@@ -244,12 +244,12 @@ export default async function PrimitivePage({
                     Variants
                   </h2>
                   <p className="mt-1 text-sm text-[color:var(--color-text-secondary)]">
-                    Stories exercised in the Ladle playground.
+                    Stories exercised in the Storybook playground.
                   </p>
                   <ul className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                     {primitive.variants.map((variant) => {
                       const href = variant.storyId
-                        ? `${LADLE_BASE}/?story=${encodeURIComponent(variant.storyId)}`
+                        ? storybookStoryUrl(variant.storyId)
                         : undefined;
                       const card = (
                         <div className="h-full rounded-xl border border-[color:var(--color-divider)] p-4 transition-colors hover:border-[color:var(--color-accent)]">

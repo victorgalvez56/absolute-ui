@@ -1,0 +1,35 @@
+{
+  "name": "@absolute-ui/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Web-facing Storybook playground for Absolute UI. React Native primitives render via react-native-web; the Next.js docs site embeds the built output as an iframe.",
+  "scripts": {
+    "dev": "storybook dev -p 61000 --no-open",
+    "build": "storybook build -o storybook-static",
+    "preview": "storybook dev -p 61000 --no-open",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "mocks:init": "pnpm --filter @absolute-ui/mocks exec msw init ../../apps/storybook/public/ --save"
+  },
+  "dependencies": {
+    "@absolute-ui/a11y": "workspace:*",
+    "@absolute-ui/core": "workspace:*",
+    "@absolute-ui/tokens": "workspace:*",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native-web": "^0.19.13"
+  },
+  "devDependencies": {
+    "@absolute-ui/mocks": "workspace:*",
+    "@storybook/addon-essentials": "^8.6.18",
+    "@storybook/addon-themes": "^8.6.18",
+    "@storybook/blocks": "^8.6.18",
+    "@storybook/react": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "storybook": "^8.6.18",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
