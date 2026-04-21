@@ -101,17 +101,16 @@ export function buildGlassSwitchTrackStyle(options: {
 
 /**
  * Thumb style. Absolutely positioned inside the track, with a left
- * offset that flips between the two rest positions. Animation is
- * out-of-scope for Phase 3 (no motion layer yet) — the thumb snaps
- * instantly, which is also the Reduced Motion target.
+ * offset that flips between the two rest positions. When the motion
+ * layer drives the slide, callers override `left` via an animated
+ * style — the static builder still returns the checked-state rest
+ * position so reduced-motion / no-animation tests see the final frame.
  */
 export function buildGlassSwitchThumbStyle(options: {
   checked: boolean;
   thumbColor: string;
 }): GlassSwitchThumbStyle {
   const { checked, thumbColor } = options;
-  const offLeft = THUMB_PADDING;
-  const onLeft = TRACK_WIDTH - THUMB_SIZE - THUMB_PADDING;
   const top = (TRACK_HEIGHT - THUMB_SIZE) / 2;
   return {
     position: 'absolute',
@@ -120,8 +119,19 @@ export function buildGlassSwitchThumbStyle(options: {
     borderRadius: THUMB_SIZE / 2,
     backgroundColor: thumbColor,
     top,
-    left: checked ? onLeft : offLeft,
+    left: resolveSwitchThumbLeft(checked),
   };
+}
+
+/**
+ * Horizontal rest position for the thumb. Exported so the motion
+ * layer can seed a shared value with the current rest and animate to
+ * the next one without reimplementing the geometry math.
+ */
+export function resolveSwitchThumbLeft(checked: boolean): number {
+  const offLeft = THUMB_PADDING;
+  const onLeft = TRACK_WIDTH - THUMB_SIZE - THUMB_PADDING;
+  return checked ? onLeft : offLeft;
 }
 
 /** Themed label style rendered next to the track. */

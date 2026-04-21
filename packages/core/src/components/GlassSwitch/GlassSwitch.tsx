@@ -1,4 +1,5 @@
-import { forwardRef, useCallback, useState } from 'react';
+import { spring } from '@absolute-ui/tokens';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Pressable,
   type PressableStateCallbackType,
@@ -6,6 +7,9 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { AnimatedView } from '../../motion/animated.js';
+import { instantTiming, toSpringConfig } from '../../motion/presets.js';
 import { useAbsoluteUI } from '../../theme-context.js';
 import {
   buildGlassSwitchLabelStyle,
@@ -16,7 +20,10 @@ import {
   resolveGlassSwitchAccessibilityLabel,
   resolveGlassSwitchAccessibilityState,
   resolveNextSwitchValue,
+  resolveSwitchThumbLeft,
 } from './style.js';
+
+const snappyCfg = toSpringConfig(spring.snappy);
 
 export type GlassSwitchProps = {
   /**
@@ -62,9 +69,11 @@ export type GlassSwitchProps = {
  *     ring GlassButton / GlassInput use.
  *   - `disabled` wins over `focused` wins over `idle`. Disabled +
  *     focused suppresses the ring — matches the rest of Phase 3.
- *   - No motion yet: the thumb snaps between positions. Reduced
- *     Motion is therefore a no-op; Phase 4's motion layer will add a
- *     spring and gate it on `preferences.reducedMotion`.
+ *   - Motion: the thumb slides between the two rest positions with
+ *     the `snappy` spring. First render seeds at the current rest
+ *     position without animating. `preferences.reducedMotion` swaps
+ *     the spring for a zero-duration timing so AT users still see the
+ *     final visual state without a crossing animation.
  *
  * Supports both controlled (`value` + `onValueChange`) and
  * uncontrolled (`defaultValue`) modes. In uncontrolled mode the
@@ -83,12 +92,32 @@ export const GlassSwitch = forwardRef<unknown, GlassSwitchProps>(function GlassS
   },
   _ref,
 ) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
   const [internalValue, setInternalValue] = useState(defaultValue);
   const checked = value ?? internalValue;
 
   const hasOnValueChange = onValueChange !== undefined;
   const interactive = isGlassSwitchInteractive({ disabled, hasOnValueChange });
+
+  // Motion: the thumb slides between the two rest positions. Seed the
+  // shared value at the current rest so the first paint doesn't
+  // animate in from 0. After mount, toggle changes spring (or instant
+  // when reducedMotion is on).
+  const thumbLeft = useSharedValue(resolveSwitchThumbLeft(checked));
+  const hasAnimatedOnce = useRef(false);
+  useEffect(() => {
+    const target = resolveSwitchThumbLeft(checked);
+    if (!hasAnimatedOnce.current) {
+      hasAnimatedOnce.current = true;
+      thumbLeft.value = target;
+      return;
+    }
+    thumbLeft.value = preferences.reducedMotion
+      ? withTiming(target, instantTiming)
+      : withSpring(target, snappyCfg);
+  }, [checked, preferences.reducedMotion]);
+
+  const animatedThumbStyle = useAnimatedStyle(() => ({ left: thumbLeft.value }));
 
   const handlePress = useCallback(() => {
     const next = resolveNextSwitchValue({ checked, disabled, hasOnValueChange });
@@ -137,7 +166,7 @@ export const GlassSwitch = forwardRef<unknown, GlassSwitchProps>(function GlassS
         onPress={handlePress}
         style={pressableStyle}
       >
-        <View style={thumbStyle} />
+        <AnimatedView style={[thumbStyle, animatedThumbStyle]} />
       </Pressable>
     </View>
   );

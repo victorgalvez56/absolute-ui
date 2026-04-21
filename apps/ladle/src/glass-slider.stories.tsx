@@ -105,6 +105,65 @@ export const Keyboard = () => {
   );
 };
 
+export const ReducedMotion = () => {
+  // Left column: filled-track and thumb spring to the new value. Right
+  // column: reducedMotion=true, so they jump to the target synchronously.
+  // Press the arrow keys on each focused slider to feel the difference.
+  const [left, setLeft] = useState(20);
+  const [right, setRight] = useState(20);
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24, padding: 24 }}>
+      <AbsoluteUIContext.Provider value={{ theme: themes.aurora, preferences: defaultPreferences }}>
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Default motion
+          </div>
+          <GlassSlider
+            label="Volume"
+            value={left}
+            onValueChange={setLeft}
+            step={5}
+            formatValue={(v) => `${v}%`}
+          />
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+      <AbsoluteUIContext.Provider
+        value={{
+          theme: themes.aurora,
+          preferences: { ...defaultPreferences, reducedMotion: true },
+        }}
+      >
+        <Backdrop theme={themes.aurora}>
+          <div
+            style={{
+              color: themes.aurora.colors.textPrimary,
+              fontSize: 14,
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Reduced Motion · thumb + fill jump instantly
+          </div>
+          <GlassSlider
+            label="Volume"
+            value={right}
+            onValueChange={setRight}
+            step={5}
+            formatValue={(v) => `${v}%`}
+          />
+        </Backdrop>
+      </AbsoluteUIContext.Provider>
+    </div>
+  );
+};
+
 export const Ranges = () => {
   const [zoom, setZoom] = useState(1);
   const [temperature, setTemperature] = useState(72);

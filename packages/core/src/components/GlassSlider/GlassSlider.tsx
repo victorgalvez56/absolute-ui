@@ -1,4 +1,5 @@
-import { forwardRef, useCallback, useState } from 'react';
+import { spring } from '@absolute-ui/tokens';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import {
   type KeyboardEventLike,
   type LayoutChangeEvent,
@@ -8,8 +9,12 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { AnimatedView } from '../../motion/animated.js';
+import { instantTiming, toSpringConfig } from '../../motion/presets.js';
 import { useAbsoluteUI } from '../../theme-context.js';
 import {
+  THUMB_SIZE,
   buildGlassSliderFilledStyle,
   buildGlassSliderLabelStyle,
   buildGlassSliderRowStyle,
@@ -28,6 +33,8 @@ import {
   resolveGlassSliderAccessibilityValue,
   snapToStep,
 } from './style.js';
+
+const snappyCfg = toSpringConfig(spring.snappy);
 
 export type GlassSliderProps = {
   /**
@@ -86,8 +93,11 @@ export type GlassSliderProps = {
  *   - focus via Pressable.focused -> themed ring identical to the
  *     rest of the Phase 3 primitives
  *   - disabled > focused > idle priority; disabled suppresses the ring
- *   - no motion: the thumb snaps instantly between stepped positions,
- *     so Reduced Motion is already a no-op
+ *   - motion: the thumb position and filled-bar width spring to the
+ *     new value whenever the slider updates, using the `snappy` token.
+ *     Reduced Motion swaps the spring for a zero-duration timing so
+ *     the final frame still matches. First render seeds at the current
+ *     value so initial paint doesn't animate in from 0.
  *   - accessibilityRole='adjustable' + accessibilityValue={min,max,
  *     now,text} so VoiceOver/TalkBack announce "Volume 42%, 42 of 100"
  *     and expose the standard increment/decrement actions
@@ -112,7 +122,7 @@ export const GlassSlider = forwardRef<unknown, GlassSliderProps>(function GlassS
   },
   _ref,
 ) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
 
   const initial = snapToStep({
     value: defaultValue ?? minimumValue,
@@ -125,9 +135,15 @@ export const GlassSlider = forwardRef<unknown, GlassSliderProps>(function GlassS
   const current = clampValue({ value: raw, min: minimumValue, max: maximumValue });
 
   const [trackWidth, setTrackWidth] = useState(0);
-  const handleLayout = useCallback((event: LayoutChangeEvent) => {
-    setTrackWidth(event.nativeEvent.layout.width);
-  }, []);
+  const trackWidthSV = useSharedValue(0);
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const w = event.nativeEvent.layout.width;
+      setTrackWidth(w);
+      trackWidthSV.value = w;
+    },
+    [trackWidthSV],
+  );
 
   const hasOnValueChange = onValueChange !== undefined;
   const interactive = isGlassSliderInteractive({ disabled, hasOnValueChange });
@@ -160,6 +176,30 @@ export const GlassSlider = forwardRef<unknown, GlassSliderProps>(function GlassS
   );
 
   const progress = computeProgress({ value: current, min: minimumValue, max: maximumValue });
+
+  // Motion: spring `progress` toward its latest value. Derived animated
+  // styles multiply by the measured track width (also a shared value)
+  // so thumb and fill stay pixel-accurate without snapping on resize.
+  const progressSV = useSharedValue(progress);
+  const hasAnimatedOnce = useRef(false);
+  useEffect(() => {
+    if (!hasAnimatedOnce.current) {
+      hasAnimatedOnce.current = true;
+      progressSV.value = progress;
+      return;
+    }
+    progressSV.value = preferences.reducedMotion
+      ? withTiming(progress, instantTiming)
+      : withSpring(progress, snappyCfg);
+  }, [progress, preferences.reducedMotion]);
+
+  const animatedFilledStyle = useAnimatedStyle(() => ({
+    width: trackWidthSV.value * progressSV.value,
+  }));
+  const animatedThumbStyle = useAnimatedStyle(() => ({
+    left: Math.round((trackWidthSV.value - THUMB_SIZE) * progressSV.value),
+  }));
+
   const wrapperStyle = buildGlassSliderWrapperStyle() as unknown as ViewStyle;
   const trackStyle = buildGlassSliderTrackStyle({
     trackColor: theme.colors.divider,
@@ -224,9 +264,9 @@ export const GlassSlider = forwardRef<unknown, GlassSliderProps>(function GlassS
         style={rowStyle}
       >
         <View style={trackStyle} onLayout={handleLayout}>
-          <View style={filledStyle} />
+          <AnimatedView style={[filledStyle, animatedFilledStyle]} />
         </View>
-        <View style={thumbStyle} />
+        <AnimatedView style={[thumbStyle, animatedThumbStyle]} />
       </Pressable>
     </View>
   );

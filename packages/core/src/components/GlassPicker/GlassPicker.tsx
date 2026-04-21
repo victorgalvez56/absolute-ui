@@ -1,16 +1,22 @@
-import { useCallback, useState } from 'react';
+import { spring } from '@absolute-ui/tokens';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   type KeyboardEventLike,
+  type LayoutChangeEvent,
   Pressable,
   type PressableStateCallbackType,
   Text,
   View,
   type ViewStyle,
 } from 'react-native';
+import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { AnimatedView } from '../../motion/animated.js';
+import { instantTiming, toSpringConfig } from '../../motion/presets.js';
 import { useAbsoluteUI } from '../../theme-context.js';
 import {
   type GlassPickerItem,
   buildGlassPickerContainerStyle,
+  buildGlassPickerIndicatorStyle,
   buildGlassPickerLabelStyle,
   buildGlassPickerSegmentStyle,
   buildGlassPickerSegmentTextStyle,
@@ -22,6 +28,9 @@ import {
   resolveGlassPickerSegmentAccessibilityState,
   resolveSelectedIndex,
 } from './style.js';
+
+const snappyCfg = toSpringConfig(spring.snappy);
+type SegmentLayout = { x: number; width: number };
 
 export type { GlassPickerItem };
 
@@ -65,9 +74,11 @@ export type GlassPickerProps<T> = {
  *     jumps to the first enabled item, End to the last
  *   - selected text flips to theme.onAccent so the tinted selected
  *     segment keeps APCA contrast on every personality
- *   - no motion: selection flips instantly, so Reduced Motion is
- *     already a no-op. Phase 4's motion layer will add a sliding
- *     underlay indicator gated on preferences.reducedMotion.
+ *   - motion: a single accent indicator slides between segments on
+ *     selection change, driven by the `snappy` spring. First render
+ *     snaps the indicator to the current selection. `preferences.
+ *     reducedMotion` swaps the spring for zero-duration timing so the
+ *     final frame is still correct for AT users.
  *
  * Generic over the item value type so callers can use string /
  * number / boolean unions without stringifying.
@@ -82,13 +93,56 @@ export function GlassPicker<T>({
   accessibilityLabel,
   style,
 }: GlassPickerProps<T>) {
-  const { theme } = useAbsoluteUI();
+  const { theme, preferences } = useAbsoluteUI();
   const [internalValue, setInternalValue] = useState<T | undefined>(defaultValue);
   const selectedValue = value ?? internalValue;
   const selectedIndex = resolveSelectedIndex({ items, selectedValue });
 
   const hasOnValueChange = onValueChange !== undefined;
   const groupInteractive = isGlassPickerInteractive({ disabled, hasOnValueChange });
+
+  // Sliding indicator: same pattern as GlassTabBar. Track per-segment
+  // (x,width) from onLayout, then spring the indicator to the active
+  // segment's layout whenever selectedIndex or layouts change.
+  const [segmentLayouts, setSegmentLayouts] = useState<Record<number, SegmentLayout>>({});
+  const indicatorX = useSharedValue(0);
+  const indicatorWidth = useSharedValue(0);
+  const initialPositioned = useRef(false);
+
+  useEffect(() => {
+    if (selectedIndex === -1) {
+      // Collapse the indicator when nothing is selected.
+      indicatorWidth.value = preferences.reducedMotion
+        ? withTiming(0, instantTiming)
+        : withSpring(0, snappyCfg);
+      return;
+    }
+    const layout = segmentLayouts[selectedIndex];
+    if (layout === undefined) return;
+    if (!initialPositioned.current) {
+      initialPositioned.current = true;
+      indicatorX.value = layout.x;
+      indicatorWidth.value = layout.width;
+      return;
+    }
+    if (preferences.reducedMotion) {
+      indicatorX.value = withTiming(layout.x, instantTiming);
+      indicatorWidth.value = withTiming(layout.width, instantTiming);
+    } else {
+      indicatorX.value = withSpring(layout.x, snappyCfg);
+      indicatorWidth.value = withSpring(layout.width, snappyCfg);
+    }
+  }, [selectedIndex, segmentLayouts, preferences.reducedMotion]);
+
+  const indicatorAnimStyle = useAnimatedStyle(() => ({
+    width: indicatorWidth.value,
+    transform: [{ translateX: indicatorX.value }],
+  }));
+
+  const handleSegmentLayout = useCallback((index: number, event: LayoutChangeEvent) => {
+    const { x, width } = event.nativeEvent.layout;
+    setSegmentLayouts((prev) => ({ ...prev, [index]: { x, width } }));
+  }, []);
 
   const applyIndex = useCallback(
     (index: number) => {
@@ -118,16 +172,21 @@ export function GlassPicker<T>({
     backgroundColor: theme.colors.divider,
   }) as unknown as ViewStyle;
   const labelStyle = buildGlassPickerLabelStyle(theme.colors.textPrimary);
+  const indicatorBaseStyle = buildGlassPickerIndicatorStyle({
+    accentColor: theme.colors.accent,
+  }) as unknown as ViewStyle;
   const resolvedLabel = resolveGlassPickerAccessibilityLabel({ accessibilityLabel, label });
 
   return (
     <View style={style}>
       {label !== undefined ? <Text style={labelStyle}>{label}</Text> : null}
       <View
-        style={containerStyle}
+        style={[containerStyle, { position: 'relative' }]}
         accessibilityRole="radiogroup"
         accessibilityLabel={resolvedLabel}
       >
+        {/* Sliding accent indicator — renders first so segments paint above it. */}
+        <AnimatedView style={[indicatorBaseStyle, indicatorAnimStyle]} pointerEvents="none" />
         {items.map((item, index) => {
           const selected = index === selectedIndex;
           const segmentInteractive = isGlassPickerSegmentInteractive({
@@ -146,11 +205,13 @@ export function GlassPicker<T>({
           });
 
           const segmentStyle = ({ focused }: PressableStateCallbackType): ViewStyle => {
+            // Segment bg stays transparent — the animated indicator
+            // owns the selected tint so the crossing actually slides.
             const s = buildGlassPickerSegmentStyle({
               selected,
               disabled: !segmentInteractive,
               focused: focused ?? false,
-              selectedColor: theme.colors.accent,
+              selectedColor: 'transparent',
               unselectedColor: 'transparent',
               focusRingColor: theme.colors.focusRing,
             });
@@ -166,6 +227,7 @@ export function GlassPicker<T>({
               disabled={!segmentInteractive}
               onPress={() => applyIndex(index)}
               onKeyDown={handleKeyDown}
+              onLayout={(e) => handleSegmentLayout(index, e)}
               style={segmentStyle}
             >
               <Text style={textStyle}>{item.label}</Text>
