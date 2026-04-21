@@ -1,4 +1,4 @@
-import { LADLE_BASE } from '@/lib/ladle';
+import { STORYBOOK_BASE } from '@/lib/storybook';
 import Link from 'next/link';
 
 const columns = [
@@ -53,7 +53,7 @@ export function Footer() {
       <div className="border-t border-[color:var(--color-divider)]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4 text-xs text-[color:var(--color-text-secondary)]">
           <span>Pre-alpha · nothing ships yet · built in the open.</span>
-          <a href={LADLE_BASE} target="_blank" rel="noreferrer" className="no-underline">
+          <a href={STORYBOOK_BASE} target="_blank" rel="noreferrer" className="no-underline">
             Live playground ↗
           </a>
         </div>
